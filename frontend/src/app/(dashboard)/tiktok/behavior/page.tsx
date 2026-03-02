@@ -429,53 +429,53 @@ export default function TikTokBehaviorPage() {
                 </div>
 
                 {expandedVideo === video.video_id && (
-                  <div className="mt-4 pt-4 border-t">
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+                  <div className="mt-4 pt-4 border-t bg-gradient-to-b from-slate-50 to-white -mx-4 px-4 pb-4">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
                       {video.intent && (
-                        <div>
-                          <p className="text-xs text-gray-500 mb-1">Intent</p>
-                          <p className="text-sm font-medium text-slate-700 bg-slate-100 px-2 py-1 rounded">
+                        <div className="bg-purple-100 border border-purple-200 rounded-lg p-3">
+                          <p className="text-xs font-semibold text-purple-600 mb-1 uppercase tracking-wide">Intent</p>
+                          <p className="text-sm font-medium text-purple-900">
                             {video.intent}
                           </p>
                         </div>
                       )}
                       {video.behavior_type && (
-                        <div>
-                          <p className="text-xs text-gray-500 mb-1">Behavior Type</p>
-                          <p className="text-sm font-medium text-slate-700 bg-slate-100 px-2 py-1 rounded">
+                        <div className="bg-blue-100 border border-blue-200 rounded-lg p-3">
+                          <p className="text-xs font-semibold text-blue-600 mb-1 uppercase tracking-wide">Behavior Type</p>
+                          <p className="text-sm font-medium text-blue-900">
                             {video.behavior_type}
                           </p>
                         </div>
                       )}
                       {video.state && (
-                        <div>
-                          <p className="text-xs text-gray-500 mb-1">State</p>
-                          <p className="text-sm font-medium text-slate-700 bg-slate-100 px-2 py-1 rounded">
+                        <div className="bg-amber-100 border border-amber-200 rounded-lg p-3">
+                          <p className="text-xs font-semibold text-amber-600 mb-1 uppercase tracking-wide">State</p>
+                          <p className="text-sm font-medium text-amber-900">
                             {video.state}
                           </p>
                         </div>
                       )}
                       {video.reinforcement_pattern && (
-                        <div>
-                          <p className="text-xs text-gray-500 mb-1">Reinforcement</p>
-                          <p className="text-sm font-medium text-slate-700 bg-slate-100 px-2 py-1 rounded">
+                        <div className="bg-emerald-100 border border-emerald-200 rounded-lg p-3">
+                          <p className="text-xs font-semibold text-emerald-600 mb-1 uppercase tracking-wide">Reinforcement</p>
+                          <p className="text-sm font-medium text-emerald-900">
                             {video.reinforcement_pattern}
                           </p>
                         </div>
                       )}
                       {video.outcome && (
-                        <div>
-                          <p className="text-xs text-gray-500 mb-1">Outcome</p>
-                          <p className="text-sm font-medium text-slate-700 bg-slate-100 px-2 py-1 rounded">
+                        <div className="bg-rose-100 border border-rose-200 rounded-lg p-3">
+                          <p className="text-xs font-semibold text-rose-600 mb-1 uppercase tracking-wide">Outcome</p>
+                          <p className="text-sm font-medium text-rose-900">
                             {video.outcome}
                           </p>
                         </div>
                       )}
                     </div>
                     {video.annotation_definition && (
-                      <div className="mb-3">
-                        <p className="text-xs text-gray-500 mb-1">Annotation Definition</p>
-                        <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded">
+                      <div className="mb-4 bg-slate-100 border border-slate-200 rounded-lg p-4">
+                        <p className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">Annotation Definition</p>
+                        <p className="text-sm text-slate-800 leading-relaxed">
                           {video.annotation_definition}
                         </p>
                       </div>
@@ -485,7 +485,7 @@ export default function TikTokBehaviorPage() {
                         href={video.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-sm text-black hover:underline"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors"
                       >
                         View on TikTok
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

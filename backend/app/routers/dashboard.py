@@ -144,8 +144,8 @@ async def get_daily_trends(
     try:
         drug_filter = ""
         if drugs:
-            drug_list = [f"'{d.strip()}'" for d in drugs.split(",")]
-            drug_filter = f"AND scientific_name IN ({','.join(drug_list)})"
+            drug_list = [f"LOWER('{d.strip()}')" for d in drugs.split(",")]
+            drug_filter = f"AND LOWER(scientific_name) IN ({','.join(drug_list)})"
 
         if platform == "tiktok":
             query = f"""
@@ -214,8 +214,8 @@ async def get_weekly_trends(
     try:
         drug_filter = ""
         if drugs:
-            drug_list = [f"'{d.strip()}'" for d in drugs.split(",")]
-            drug_filter = f"AND scientific_name IN ({','.join(drug_list)})"
+            drug_list = [f"LOWER('{d.strip()}')" for d in drugs.split(",")]
+            drug_filter = f"AND LOWER(scientific_name) IN ({','.join(drug_list)})"
 
         if platform == "reddit":
             # Query from silver table with is_substance_use filter - group by day for granularity
@@ -293,7 +293,7 @@ async def get_reddit_posts(
             "is_substance_use = TRUE"  # Only show posts marked as substance use
         ]
         if drug:
-            filters.append(f"scientific_name = '{drug}'")
+            filters.append(f"LOWER(scientific_name) = LOWER('{drug}')")
         if subreddit:
             filters.append(f"subreddit = '{subreddit}'")
 
@@ -348,7 +348,7 @@ async def get_tiktok_posts(
             "is_substance_use = TRUE"  # Only show posts marked as substance use
         ]
         if drug:
-            filters.append(f"scientific_name = '{drug}'")
+            filters.append(f"LOWER(scientific_name) = LOWER('{drug}')")
 
         where_clause = " AND ".join(filters)
 
@@ -402,7 +402,7 @@ async def get_youtube_posts(
             "scientific_name IS NOT NULL"  # Only show classified posts
         ]
         if drug:
-            filters.append(f"scientific_name = '{drug}'")
+            filters.append(f"LOWER(scientific_name) = LOWER('{drug}')")
 
         where_clause = " AND ".join(filters)
 
@@ -530,7 +530,7 @@ async def get_drug_stats(drug_name: str):
                 SUM(total_score) as reddit_score,
                 SUM(total_comments) as reddit_comments
             FROM sparkg_gold.weekly_drug_counts
-            WHERE scientific_name = '{drug_name}'
+            WHERE LOWER(scientific_name) = LOWER('{drug_name}')
         ),
         tiktok_stats AS (
             SELECT
@@ -538,7 +538,7 @@ async def get_drug_stats(drug_name: str):
                 SUM(total_views) as tiktok_views,
                 SUM(total_likes) as tiktok_likes
             FROM sparkg_gold.tiktok_daily_trends
-            WHERE scientific_name = '{drug_name}'
+            WHERE LOWER(scientific_name) = LOWER('{drug_name}')
         ),
         youtube_stats AS (
             SELECT
@@ -546,12 +546,12 @@ async def get_drug_stats(drug_name: str):
                 SUM(total_views) as youtube_views,
                 SUM(total_likes) as youtube_likes
             FROM sparkg_gold.youtube_weekly_engagement
-            WHERE scientific_name = '{drug_name}'
+            WHERE LOWER(scientific_name) = LOWER('{drug_name}')
         ),
         drug_info AS (
             SELECT category, common_terms, controlled_substance
             FROM sparkg_gold.drug_terms
-            WHERE scientific_name = '{drug_name}'
+            WHERE LOWER(scientific_name) = LOWER('{drug_name}')
         )
         SELECT
             '{drug_name}' as scientific_name,
@@ -1298,7 +1298,7 @@ async def export_platform_data(
             if end_date:
                 filters.append(f"{date_field} <= '{end_date}'")
             if drug:
-                filters.append(f"scientific_name = '{drug}'")
+                filters.append(f"LOWER(scientific_name) = LOWER('{drug}')")
 
             where_clause = " AND ".join(filters)
 
@@ -1329,7 +1329,7 @@ async def export_platform_data(
             if end_date:
                 filters.append(f"DATE({date_field}) <= '{end_date}'")
             if drug:
-                filters.append(f"scientific_name = '{drug}'")
+                filters.append(f"LOWER(scientific_name) = LOWER('{drug}')")
 
             where_clause = " AND ".join(filters)
 
@@ -1360,7 +1360,7 @@ async def export_platform_data(
             if end_date:
                 filters.append(f"DATE({date_field}) <= '{end_date}'")
             if drug:
-                filters.append(f"scientific_name = '{drug}'")
+                filters.append(f"LOWER(scientific_name) = LOWER('{drug}')")
 
             where_clause = " AND ".join(filters)
 
