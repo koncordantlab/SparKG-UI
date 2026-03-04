@@ -9,8 +9,9 @@ from app.services.bigquery_service import BigQueryService
 router = APIRouter()
 bq_service = BigQueryService()
 
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "https://cs-kdd-nl-llm.kdd.cs.ksu.edu/api/api")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1")
+OLLAMA_COOKIE = os.getenv("OLLAMA_COOKIE", "")
 
 SYSTEM_PROMPT = """You are a SPAR-KG drug monitoring analyst assistant. You analyze drug-related content trends across social media platforms (Reddit, TikTok, YouTube).
 
@@ -53,21 +54,23 @@ async def ask_question(request: ChatRequest):
             {"role": "user", "content": request.question},
         ]
 
-        # Call Ollama
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        # Call Ollama (remote KDD LLM service)
+        cookies = {"_oauth2_proxy": OLLAMA_COOKIE} if OLLAMA_COOKIE else {}
+        async with httpx.AsyncClient(timeout=120.0) as client:
             response = await client.post(
-                f"{OLLAMA_BASE_URL}/api/chat",
+                f"{OLLAMA_BASE_URL}/chat",
                 json={
                     "model": OLLAMA_MODEL,
                     "messages": messages,
                     "stream": False,
                 },
+                cookies=cookies,
             )
 
             if response.status_code != 200:
                 raise HTTPException(
                     status_code=502,
-                    detail="LLM service returned an error. Ensure Ollama is running with `ollama serve`.",
+                    detail=f"LLM service returned status {response.status_code}. Check OLLAMA_COOKIE is valid.",
                 )
 
             result = response.json()
@@ -81,12 +84,12 @@ async def ask_question(request: ChatRequest):
     except httpx.ConnectError:
         raise HTTPException(
             status_code=503,
-            detail="Cannot connect to Ollama. Please start it with `ollama serve`.",
+            detail="Cannot connect to the LLM service. Check network or OLLAMA_BASE_URL.",
         )
     except httpx.TimeoutException:
         raise HTTPException(
             status_code=504,
-            detail="LLM request timed out. The model may be loading. Please try again.",
+            detail="LLM request timed out. The model may be loading — try again in a moment.",
         )
     except HTTPException:
         raise
@@ -98,8 +101,9 @@ async def ask_question(request: ChatRequest):
 async def chat_health():
     """Check if Ollama is reachable."""
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.get(f"{OLLAMA_BASE_URL}/api/tags")
+        cookies = {"_oauth2_proxy": OLLAMA_COOKIE} if OLLAMA_COOKIE else {}
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(f"{OLLAMA_BASE_URL}/tags", cookies=cookies)
             if response.status_code == 200:
                 models = response.json().get("models", [])
                 model_names = [m.get("name", "") for m in models]
@@ -107,10 +111,11 @@ async def chat_health():
                     "status": "connected",
                     "model": OLLAMA_MODEL,
                     "available_models": model_names,
+                    "base_url": OLLAMA_BASE_URL,
                 }
-        return {"status": "error", "detail": "Unexpected response from Ollama"}
-    except Exception:
-        return {"status": "disconnected", "detail": "Ollama is not running"}
+            return {"status": "error", "detail": f"Status {response.status_code} - cookie may be expired"}
+    except Exception as e:
+        return {"status": "disconnected", "detail": f"Cannot reach LLM service: {str(e)}"}
 
 
 async def _build_data_context(context: Dict[str, Any]) -> str:
