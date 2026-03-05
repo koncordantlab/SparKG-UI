@@ -3,7 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 load_dotenv()
 
-from app.routers import bigquery, dashboard, chat, ranking
+from app.routers import bigquery, dashboard, chat
+try:
+    from app.routers import ranking
+except ImportError:
+    ranking = None
 
 app = FastAPI(
     title="SparKG Dashboard API",
@@ -22,7 +26,8 @@ app.add_middleware(
 app.include_router(bigquery.router, prefix="/api/v1", tags=["bigquery"])
 app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["dashboard"])
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["chat"])
-app.include_router(ranking.router, prefix="/api/v1/ranking", tags=["ranking"])
+if ranking:
+    app.include_router(ranking.router, prefix="/api/v1/ranking", tags=["ranking"])
 
 
 @app.get("/health")
