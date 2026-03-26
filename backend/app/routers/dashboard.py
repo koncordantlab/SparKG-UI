@@ -340,13 +340,9 @@ async def get_tiktok_posts(
     drug: Optional[str] = None,
     days: int = 30
 ):
-    """Get TikTok videos from silver table with filters. Only shows classified posts marked as relevant."""
+    """Get TikTok videos from gold table with filters."""
     try:
-        filters = [
-            f"created_date >= DATE_SUB(CURRENT_DATE(), INTERVAL {days} DAY)",
-            "scientific_name IS NOT NULL",  # Only show classified posts
-            "is_substance_use = TRUE"  # Only show posts marked as substance use
-        ]
+        filters = ["scientific_name IS NOT NULL"]
         if drug:
             filters.append(f"LOWER(scientific_name) = LOWER('{drug}')")
 
@@ -365,9 +361,9 @@ async def get_tiktok_posts(
             published_at,
             url,
             scientific_name,
-            substance_use_confidence,
+            0.0 as substance_use_confidence,
             transcript
-        FROM sparkg_silver.tiktok_videos
+        FROM sparkg_gold.tiktok_top_videos
         WHERE {where_clause}
         ORDER BY published_at DESC
         LIMIT {limit} OFFSET {offset}
@@ -375,7 +371,7 @@ async def get_tiktok_posts(
 
         count_query = f"""
         SELECT COUNT(*) as total
-        FROM sparkg_silver.tiktok_videos
+        FROM sparkg_gold.tiktok_top_videos
         WHERE {where_clause}
         """
 
@@ -643,17 +639,33 @@ async def get_tiktok_stats():
     """Get TikTok-specific overview stats."""
     try:
         query = """
+        WITH agg AS (
+            SELECT
+                SUM(video_count) as total_videos,
+                SUM(total_views) as total_views,
+                SUM(total_likes) as total_likes,
+                SUM(total_shares) as total_shares,
+                COUNT(DISTINCT scientific_name) as unique_drugs
+            FROM sparkg_gold.tiktok_daily_trends
+        ),
+        vid AS (
+            SELECT
+                COUNT(*) as cnt,
+                SUM(comment_count) as total_comments,
+                AVG(view_count) as avg_views_per_video,
+                AVG(like_count) as avg_likes_per_video
+            FROM sparkg_gold.tiktok_top_videos
+        )
         SELECT
-            COUNT(*) as total_videos,
-            SUM(view_count) as total_views,
-            SUM(like_count) as total_likes,
-            SUM(comment_count) as total_comments,
-            SUM(share_count) as total_shares,
-            COUNT(DISTINCT scientific_name) as unique_drugs,
-            AVG(view_count) as avg_views_per_video,
-            AVG(like_count) as avg_likes_per_video
-        FROM sparkg_silver.tiktok_videos
-        WHERE is_substance_use = TRUE AND scientific_name IS NOT NULL
+            a.total_videos,
+            a.total_views,
+            a.total_likes,
+            v.total_comments,
+            a.total_shares,
+            a.unique_drugs,
+            v.avg_views_per_video,
+            v.avg_likes_per_video
+        FROM agg a, vid v
         """
         results = bq_service.execute_query(query, 1)
         return results[0] if results else {}
@@ -668,16 +680,16 @@ async def get_tiktok_drugs_breakdown():
         query = """
         SELECT
             t.scientific_name,
-            COUNT(*) as video_count,
-            SUM(t.view_count) as total_views,
-            SUM(t.like_count) as total_likes,
-            SUM(t.comment_count) as total_comments,
-            AVG(t.view_count) as avg_views,
-            AVG(t.substance_use_confidence) as avg_confidence,
-            d.category
-        FROM sparkg_silver.tiktok_videos t
+            SUM(t.video_count) as video_count,
+            SUM(t.total_views) as total_views,
+            SUM(t.total_likes) as total_likes,
+            0 as total_comments,
+            SAFE_DIVIDE(SUM(t.total_views), SUM(t.video_count)) as avg_views,
+            0.0 as avg_confidence,
+            COALESCE(d.category, 'unknown') as category
+        FROM sparkg_gold.tiktok_daily_trends t
         LEFT JOIN sparkg_gold.drug_terms d ON t.scientific_name = d.scientific_name
-        WHERE t.is_substance_use = TRUE AND t.scientific_name IS NOT NULL
+        WHERE t.scientific_name IS NOT NULL
         GROUP BY t.scientific_name, d.category
         ORDER BY video_count DESC
         """
@@ -702,10 +714,10 @@ async def get_tiktok_recent_videos(limit: int = 10):
             published_at,
             url,
             scientific_name,
-            substance_use_confidence,
+            0.0 as substance_use_confidence,
             SUBSTR(transcript, 1, 200) as transcript_preview
-        FROM sparkg_silver.tiktok_videos
-        WHERE is_substance_use = TRUE AND scientific_name IS NOT NULL
+        FROM sparkg_gold.tiktok_top_videos
+        WHERE scientific_name IS NOT NULL
         ORDER BY published_at DESC
         LIMIT {limit}
         """
@@ -721,12 +733,12 @@ async def get_tiktok_category_breakdown():
         query = """
         SELECT
             COALESCE(d.category, 'unknown') as category,
-            COUNT(*) as video_count,
-            SUM(t.view_count) as total_views,
-            SUM(t.like_count) as total_likes
-        FROM sparkg_silver.tiktok_videos t
+            SUM(t.video_count) as video_count,
+            SUM(t.total_views) as total_views,
+            SUM(t.total_likes) as total_likes
+        FROM sparkg_gold.tiktok_daily_trends t
         LEFT JOIN sparkg_gold.drug_terms d ON t.scientific_name = d.scientific_name
-        WHERE t.is_substance_use = TRUE AND t.scientific_name IS NOT NULL
+        WHERE t.scientific_name IS NOT NULL
         GROUP BY category
         ORDER BY video_count DESC
         """
@@ -759,17 +771,17 @@ async def get_tiktok_drugs(
         sort_column = "mention_count" if sort_by == "mentions" else "scientific_name"
         sort_dir = "DESC" if sort_order == "desc" else "ASC"
 
-        # Query directly from silver table, only drugs with actual TikTok videos
+        # Query from gold table
         query = f"""
         SELECT
             t.scientific_name,
             MAX(d.common_terms) as common_terms,
             MAX(d.category) as category,
             MAX(d.controlled_substance) as controlled_substance,
-            COUNT(*) as mention_count
-        FROM sparkg_silver.tiktok_videos t
+            SUM(t.video_count) as mention_count
+        FROM sparkg_gold.tiktok_daily_trends t
         LEFT JOIN sparkg_gold.drug_terms d ON t.scientific_name = d.scientific_name
-        WHERE t.is_substance_use = TRUE AND t.scientific_name IS NOT NULL
+        WHERE t.scientific_name IS NOT NULL
         GROUP BY t.scientific_name
         {having_clause}
         ORDER BY {sort_column} {sort_dir}, scientific_name ASC
@@ -779,9 +791,9 @@ async def get_tiktok_drugs(
         # Count query for pagination
         count_query = f"""
         SELECT COUNT(DISTINCT t.scientific_name) as total
-        FROM sparkg_silver.tiktok_videos t
+        FROM sparkg_gold.tiktok_daily_trends t
         LEFT JOIN sparkg_gold.drug_terms d ON t.scientific_name = d.scientific_name
-        WHERE t.is_substance_use = TRUE AND t.scientific_name IS NOT NULL
+        WHERE t.scientific_name IS NOT NULL
         {having_clause.replace('HAVING', 'AND') if having_clause else ''}
         """
 
@@ -801,9 +813,9 @@ async def get_tiktok_drugs_filter(limit: int = 500):
         query = f"""
         SELECT
             scientific_name,
-            COUNT(*) as video_count
-        FROM sparkg_silver.tiktok_videos
-        WHERE is_substance_use = TRUE AND scientific_name IS NOT NULL
+            SUM(video_count) as video_count
+        FROM sparkg_gold.tiktok_daily_trends
+        WHERE scientific_name IS NOT NULL
         GROUP BY scientific_name
         ORDER BY video_count DESC
         LIMIT {limit}
@@ -1217,7 +1229,7 @@ async def get_export_date_range(platform: str):
                 MIN(DATE(published_at)) as min_date,
                 MAX(DATE(published_at)) as max_date
             FROM sparkg_silver.tiktok_videos
-            WHERE is_substance_use = TRUE AND scientific_name IS NOT NULL
+            WHERE scientific_name IS NOT NULL
             """
         elif platform == "youtube":
             query = """
@@ -1256,7 +1268,7 @@ async def get_export_drugs(platform: str):
             query = """
             SELECT DISTINCT scientific_name
             FROM sparkg_silver.tiktok_videos
-            WHERE is_substance_use = TRUE AND scientific_name IS NOT NULL
+            WHERE scientific_name IS NOT NULL
             ORDER BY scientific_name
             """
         elif platform == "youtube":
@@ -1321,7 +1333,7 @@ async def export_platform_data(
             """
 
         elif platform == "tiktok":
-            filters = ["is_substance_use = TRUE", "scientific_name IS NOT NULL"]
+            filters = ["scientific_name IS NOT NULL"]
             date_field = "published_at"
 
             if start_date:

@@ -90,9 +90,9 @@ export default function TikTokDashboard() {
       ])
 
       setStats(statsData)
-      setDrugsBreakdown(drugsData)
-      setRecentVideos(videosData)
-      setCategoryBreakdown(catData)
+      setDrugsBreakdown(Array.isArray(drugsData) ? drugsData : [])
+      setRecentVideos(Array.isArray(videosData) ? videosData : [])
+      setCategoryBreakdown(Array.isArray(catData) ? catData : [])
     } catch (err) {
       console.error('Failed to load TikTok data:', err)
     } finally {
@@ -114,7 +114,7 @@ export default function TikTokDashboard() {
   }
 
   // Calculate max video count for bar widths
-  const maxVideos = Math.max(...drugsBreakdown.map(d => d.video_count), 1)
+  const maxVideos = Math.max(...(drugsBreakdown || []).map(d => d.video_count), 1)
 
   if (loading) {
     return (

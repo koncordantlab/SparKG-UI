@@ -118,7 +118,7 @@ export default function TikTokVideosPage() {
   }
 
   // Filter out videos without descriptions
-  const videosWithDescriptions = videos.filter(v => v.description && v.description.trim())
+  const videosWithDescriptions = (videos || []).filter(v => v.description && v.description.trim())
   const totalPages = Math.ceil(total / limit)
 
   return (

@@ -38,3 +38,7 @@ coverage/
 *.key
 credentials.json
 service-account*.json
+
+# Data and docs
+docs/
+March2nd-2026/
