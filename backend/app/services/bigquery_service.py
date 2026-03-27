@@ -18,11 +18,19 @@ class BigQueryService:
         credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
         if credentials_path and os.path.exists(credentials_path):
-            credentials = service_account.Credentials.from_service_account_file(
-                credentials_path,
-                scopes=["https://www.googleapis.com/auth/bigquery"]
-            )
-            self.client = bigquery.Client(project=self.project_id, credentials=credentials)
+            import json
+            with open(credentials_path) as f:
+                cred_info = json.load(f)
+
+            if cred_info.get("type") == "service_account":
+                credentials = service_account.Credentials.from_service_account_file(
+                    credentials_path,
+                    scopes=["https://www.googleapis.com/auth/bigquery"]
+                )
+                self.client = bigquery.Client(project=self.project_id, credentials=credentials)
+            else:
+                # User credentials (from gcloud auth application-default login)
+                self.client = bigquery.Client(project=self.project_id)
         else:
             # Fall back to default credentials (gcloud auth)
             self.client = bigquery.Client(project=self.project_id)
