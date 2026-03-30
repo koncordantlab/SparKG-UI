@@ -2,13 +2,15 @@
 
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import type { LineChartPoint } from '@/lib/chat/types'
+import ExportButton, { type ExportContext } from './ExportButton'
 
 interface Props {
   data: LineChartPoint[]
   title?: string
+  exportContext?: ExportContext
 }
 
-export default function InlineLineChart({ data, title }: Props) {
+export default function InlineLineChart({ data, title, exportContext }: Props) {
   if (!data || data.length === 0) return null
 
   // Detect numeric keys besides 'date'
@@ -25,7 +27,10 @@ export default function InlineLineChart({ data, title }: Props) {
 
   return (
     <div className="mt-3">
-      {title && <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{title}</p>}
+      <div className="flex items-center justify-between mb-2">
+        {title && <p className="text-xs font-semibold text-gray-500 uppercase">{title}</p>}
+        <ExportButton data={data} filename={title?.replace(/\s+/g, '_').toLowerCase() || 'trend_data'} exportContext={exportContext} />
+      </div>
       <div className="bg-gray-50 rounded-lg p-3 border">
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={formatted} margin={{ left: 0, right: 10, top: 5, bottom: 0 }}>

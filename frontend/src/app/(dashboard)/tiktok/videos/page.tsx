@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 interface TikTokVideo {
@@ -20,6 +20,14 @@ interface TikTokVideo {
 }
 
 export default function TikTokVideosPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-gray-500">Loading...</div>}>
+      <TikTokVideosContent />
+    </Suspense>
+  )
+}
+
+function TikTokVideosContent() {
   const searchParams = useSearchParams()
   const drugFromUrl = searchParams.get('drug') || ''
 

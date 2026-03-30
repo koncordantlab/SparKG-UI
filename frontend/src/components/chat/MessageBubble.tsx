@@ -64,15 +64,16 @@ export default function MessageBubble({ message, onOptionSelect, isLatest }: Pro
 function renderInlineContent(content: ChatMessage['inlineContent']) {
   if (!content) return null
 
+  const ec = content.exportContext
   switch (content.type) {
     case 'stats-cards':
-      return <InlineStatsCards data={content.data as StatCard[]} title={content.title} />
+      return <InlineStatsCards data={content.data as StatCard[]} title={content.title} exportContext={ec} />
     case 'bar-chart':
-      return <InlineBarChart data={content.data as BarChartItem[]} title={content.title} />
+      return <InlineBarChart data={content.data as BarChartItem[]} title={content.title} exportContext={ec} />
     case 'line-chart':
-      return <InlineLineChart data={content.data as LineChartPoint[]} title={content.title} />
+      return <InlineLineChart data={content.data as LineChartPoint[]} title={content.title} exportContext={ec} />
     case 'posts-list':
-      return <InlinePostsList data={content.data as PostItem[]} title={content.title} />
+      return <InlinePostsList data={content.data as PostItem[]} title={content.title} exportContext={ec} />
     default:
       return null
   }

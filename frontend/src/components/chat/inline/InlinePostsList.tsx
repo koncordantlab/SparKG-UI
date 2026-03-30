@@ -1,13 +1,15 @@
 'use client'
 
 import type { PostItem } from '@/lib/chat/types'
+import ExportButton, { type ExportContext } from './ExportButton'
 
 interface Props {
   data: PostItem[]
   title?: string
+  exportContext?: ExportContext
 }
 
-export default function InlinePostsList({ data, title }: Props) {
+export default function InlinePostsList({ data, title, exportContext }: Props) {
   if (!data || data.length === 0) {
     return (
       <div className="mt-3 bg-gray-50 rounded-lg p-4 border text-center text-sm text-gray-500">
@@ -18,7 +20,10 @@ export default function InlinePostsList({ data, title }: Props) {
 
   return (
     <div className="mt-3">
-      {title && <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{title}</p>}
+      <div className="flex items-center justify-between mb-2">
+        {title && <p className="text-xs font-semibold text-gray-500 uppercase">{title}</p>}
+        <ExportButton data={data} filename={title?.replace(/\s+/g, '_').toLowerCase() || 'posts_data'} exportContext={exportContext} />
+      </div>
       <div className="space-y-2 max-h-80 overflow-y-auto">
         {data.map((post) => (
           <div key={post.id} className="bg-gray-50 rounded-lg p-3 border hover:bg-gray-100 transition-colors">

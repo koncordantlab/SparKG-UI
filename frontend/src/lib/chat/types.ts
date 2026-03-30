@@ -12,6 +12,7 @@ export interface InlineContent {
   type: InlineComponentType
   data: unknown
   title?: string
+  exportContext?: { drug?: string; platform?: string }
 }
 
 export interface ChatMessage {

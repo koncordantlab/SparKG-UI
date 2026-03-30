@@ -219,7 +219,7 @@ async def get_weekly_trends(
 
         if platform == "reddit":
             # Query from silver table with is_substance_use filter - group by day for granularity
-            base_filter = "WHERE is_substance_use = TRUE AND scientific_name IS NOT NULL"
+            base_filter = f"WHERE is_substance_use = TRUE AND scientific_name IS NOT NULL AND created_date >= DATE_SUB(CURRENT_DATE(), INTERVAL {weeks * 7} DAY)"
             if drug_filter:
                 base_filter += f" {drug_filter}"
             query = f"""
@@ -233,11 +233,11 @@ async def get_weekly_trends(
             {base_filter}
             GROUP BY date, scientific_name
             ORDER BY date DESC, mentions DESC
-            LIMIT 1000
+            LIMIT 10000
             """
         elif platform == "youtube":
             # Query from silver table like Reddit - group by day for granularity
-            base_filter = "WHERE scientific_name IS NOT NULL"
+            base_filter = f"WHERE scientific_name IS NOT NULL AND created_date >= DATE_SUB(CURRENT_DATE(), INTERVAL {weeks * 7} DAY)"
             if drug_filter:
                 base_filter += f" {drug_filter}"
             query = f"""
@@ -252,9 +252,12 @@ async def get_weekly_trends(
             {base_filter}
             GROUP BY date, scientific_name
             ORDER BY date DESC, mentions DESC
-            LIMIT 1000
+            LIMIT 10000
             """
         else:
+            time_filter = f"WHERE ingestion_week >= DATE_SUB(CURRENT_DATE(), INTERVAL {weeks * 7} DAY)"
+            if drug_filter:
+                time_filter += f" {drug_filter}"
             query = f"""
             SELECT
                 ingestion_week as week,
@@ -262,15 +265,16 @@ async def get_weekly_trends(
                 SUM(video_count) as mentions,
                 SUM(total_views) as total_views
             FROM sparkg_gold.tiktok_videos_by_drug_week
-            {drug_filter.replace('AND', 'WHERE', 1) if drug_filter else ''}
+            {time_filter}
             GROUP BY ingestion_week, scientific_name
             ORDER BY week DESC, mentions DESC
-            LIMIT 1000
+            LIMIT 10000
             """
 
-        return bq_service.execute_query(query)
+        return bq_service.execute_query(query, max_results=10000)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 # =============================================================================

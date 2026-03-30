@@ -2,20 +2,25 @@
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import type { BarChartItem } from '@/lib/chat/types'
+import ExportButton, { type ExportContext } from './ExportButton'
 
 const COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#6366f1', '#14b8a6', '#f97316', '#06b6d4']
 
 interface Props {
   data: BarChartItem[]
   title?: string
+  exportContext?: ExportContext
 }
 
-export default function InlineBarChart({ data, title }: Props) {
+export default function InlineBarChart({ data, title, exportContext }: Props) {
   if (!data || data.length === 0) return null
 
   return (
     <div className="mt-3">
-      {title && <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{title}</p>}
+      <div className="flex items-center justify-between mb-2">
+        {title && <p className="text-xs font-semibold text-gray-500 uppercase">{title}</p>}
+        <ExportButton data={data} filename={title?.replace(/\s+/g, '_').toLowerCase() || 'chart_data'} exportContext={exportContext} />
+      </div>
       <div className="bg-gray-50 rounded-lg p-3 border">
         <ResponsiveContainer width="100%" height={Math.min(data.length * 36, 360)}>
           <BarChart data={data} layout="vertical" margin={{ left: 0, right: 20, top: 0, bottom: 0 }}>

@@ -89,6 +89,10 @@ export async function processNodeEntry(state: ChatState): Promise<ChatState> {
       type: node.renderResult,
       data,
       title: resultTitle,
+      exportContext: {
+        drug: newState.context.selectedDrug,
+        platform: newState.context.selectedPlatform,
+      },
     }
   }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 interface YouTubeVideo {
@@ -18,6 +18,14 @@ interface YouTubeVideo {
 }
 
 export default function YouTubeVideosPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-gray-500">Loading...</div>}>
+      <YouTubeVideosContent />
+    </Suspense>
+  )
+}
+
+function YouTubeVideosContent() {
   const searchParams = useSearchParams()
   const drugFromUrl = searchParams.get('drug') || ''
 
