@@ -408,7 +408,7 @@ export default function RedditDashboard() {
               <XAxis
                 dataKey="displayDate"
                 tick={{ fontSize: 11 }}
-                interval={0}
+                interval={Math.max(0, Math.floor(getLineChartData().length / 12) - 1)}
                 angle={-45}
                 textAnchor="end"
                 height={60}
