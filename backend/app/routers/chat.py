@@ -56,7 +56,7 @@ async def ask_question(request: ChatRequest):
 
         # Call Ollama (remote KDD LLM service)
         cookies = {"_oauth2_proxy": OLLAMA_COOKIE} if OLLAMA_COOKIE else {}
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=120.0, verify=False) as client:
             response = await client.post(
                 f"{OLLAMA_BASE_URL}/chat",
                 json={
@@ -102,7 +102,7 @@ async def chat_health():
     """Check if Ollama is reachable."""
     try:
         cookies = {"_oauth2_proxy": OLLAMA_COOKIE} if OLLAMA_COOKIE else {}
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with httpx.AsyncClient(timeout=10.0, verify=False) as client:
             response = await client.get(f"{OLLAMA_BASE_URL}/tags", cookies=cookies)
             if response.status_code == 200:
                 models = response.json().get("models", [])
