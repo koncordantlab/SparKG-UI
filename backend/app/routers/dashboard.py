@@ -294,7 +294,8 @@ async def get_reddit_posts(
         filters = [
             f"created_date >= DATE_SUB(CURRENT_DATE(), INTERVAL {days} DAY)",
             "scientific_name IS NOT NULL",  # Only show classified posts
-            "is_substance_use = TRUE"  # Only show posts marked as substance use
+            "is_substance_use = TRUE",  # Only show posts marked as substance use
+            "substance_use_confidence > 0.5"  # Filter posts below 50% confidence
         ]
         if drug:
             filters.append(f"LOWER(scientific_name) = LOWER('{drug}')")
