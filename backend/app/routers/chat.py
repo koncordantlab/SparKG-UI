@@ -9,7 +9,7 @@ from app.services.bigquery_service import BigQueryService
 router = APIRouter()
 bq_service = BigQueryService()
 
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "https://cs-kdd-nl-llm.kdd.cs.ksu.edu/api/api")
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "https://cs-kdd-nl-llm.kdd.cs.ksu.edu/ollama/api")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1")
 OLLAMA_COOKIE = os.getenv("OLLAMA_COOKIE", "")
 
