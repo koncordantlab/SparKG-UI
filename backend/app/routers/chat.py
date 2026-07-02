@@ -9,9 +9,25 @@ from app.services.bigquery_service import BigQueryService
 router = APIRouter()
 bq_service = BigQueryService()
 
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "https://cs-kdd-nl-llm.kdd.cs.ksu.edu/ollama/api")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1")
-OLLAMA_COOKIE = os.getenv("OLLAMA_COOKIE", "")
+LLM_PROVIDERS = {
+    "mac_studio": {
+        "base_url": "http://mac-studio:11435/api",
+        "model": "qwen3:8b",
+        "cookie": "",
+    },
+    "kdd": {
+        "base_url": "https://cs-kdd-nl-llm.kdd.cs.ksu.edu/ollama/api",
+        "model": "llama3.1",
+        "cookie": "",
+    },
+}
+
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "mac_studio").lower()
+_provider_defaults = LLM_PROVIDERS.get(LLM_PROVIDER, LLM_PROVIDERS["mac_studio"])
+
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", _provider_defaults["base_url"])
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", _provider_defaults["model"])
+OLLAMA_COOKIE = os.getenv("OLLAMA_COOKIE", _provider_defaults["cookie"])
 
 SYSTEM_PROMPT = """You are a SPAR-KG drug monitoring analyst assistant. You analyze drug-related content trends across social media platforms (Reddit, TikTok, YouTube).
 
@@ -109,6 +125,7 @@ async def chat_health():
                 model_names = [m.get("name", "") for m in models]
                 return {
                     "status": "connected",
+                    "provider": LLM_PROVIDER,
                     "model": OLLAMA_MODEL,
                     "available_models": model_names,
                     "base_url": OLLAMA_BASE_URL,
