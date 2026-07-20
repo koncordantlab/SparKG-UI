@@ -8,6 +8,10 @@ try:
     from app.routers import ranking
 except ImportError:
     ranking = None
+try:
+    from app.routers import video_sponsor_story
+except ImportError:
+    video_sponsor_story = None
 
 app = FastAPI(
     title="SparKG Dashboard API",
@@ -28,6 +32,8 @@ app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["dashboar
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["chat"])
 if ranking:
     app.include_router(ranking.router, prefix="/api/v1/ranking", tags=["ranking"])
+if video_sponsor_story:
+    app.include_router(video_sponsor_story.router, prefix="/api/v1/dashboard/tiktok", tags=["sponsor-story"])
 
 
 @app.get("/health")
