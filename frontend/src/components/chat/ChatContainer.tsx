@@ -77,7 +77,7 @@ export default function ChatContainer() {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 bg-white border-b">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
             </svg>
@@ -111,14 +111,12 @@ export default function ChatContainer() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Text input — always visible when flow requests it */}
-      {showTextInput && (
-        <ChatTextInput
-          onSubmit={handleTextSubmit}
-          placeholder="Type your question..."
-          disabled={chatState.isLoading}
-        />
-      )}
+      {/* Text input — always visible */}
+      <ChatTextInput
+        onSubmit={handleTextSubmit}
+        placeholder="Type your question..."
+        disabled={chatState.isLoading}
+      />
     </div>
   )
 }

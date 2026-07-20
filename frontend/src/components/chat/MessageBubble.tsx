@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import type { ChatMessage, StatCard, BarChartItem, LineChartPoint, PostItem } from '@/lib/chat/types'
 import QuickReplyButtons from './QuickReplyButtons'
 import InlineStatsCards from './inline/InlineStatsCards'
@@ -13,13 +14,38 @@ interface Props {
   isLatest: boolean
 }
 
+function TypewriterText({ text, isLatest }: { text: string; isLatest: boolean }) {
+  const [displayed, setDisplayed] = useState(isLatest ? '' : text)
+
+  useEffect(() => {
+    if (!isLatest) {
+      setDisplayed(text)
+      return
+    }
+    setDisplayed('')
+    let i = 0
+    const interval = setInterval(() => {
+      i++
+      setDisplayed(text.slice(0, i))
+      if (i >= text.length) clearInterval(interval)
+    }, 12)
+    return () => clearInterval(interval)
+  }, [text, isLatest])
+
+  return (
+    <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-800">
+      {displayed}
+    </p>
+  )
+}
+
 export default function MessageBubble({ message, onOptionSelect, isLatest }: Props) {
   const isBot = message.sender === 'bot'
 
   return (
     <div className={`flex ${isBot ? 'items-start' : 'items-start justify-end'} px-4 py-2`}>
       {isBot && (
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0 mr-3">
+        <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0 mr-3">
           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
           </svg>
@@ -34,11 +60,13 @@ export default function MessageBubble({ message, onOptionSelect, isLatest }: Pro
               : 'bg-purple-100 text-purple-900 rounded-tr-sm'
           }`}
         >
-          {message.text && (
-            <p className={`text-sm leading-relaxed whitespace-pre-wrap ${isBot ? 'text-gray-800' : ''}`}>
+          {message.text && isBot ? (
+            <TypewriterText text={message.text} isLatest={isLatest} />
+          ) : message.text ? (
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">
               {message.text}
             </p>
-          )}
+          ) : null}
 
           {/* Inline content */}
           {message.inlineContent && renderInlineContent(message.inlineContent)}

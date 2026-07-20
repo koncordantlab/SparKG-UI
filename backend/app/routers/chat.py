@@ -57,8 +57,9 @@ class ChatResponse(BaseModel):
 async def ask_question(request: ChatRequest):
     """Send a question to the LLM with relevant data context."""
     try:
-        # Build context from BigQuery data
-        data_context = await _build_data_context(request.context or {})
+        # Build context from BigQuery data, also pass question for drug extraction
+        context_with_question = {**(request.context or {}), "question": request.question}
+        data_context = await _build_data_context(context_with_question)
 
         # Build messages for Ollama
         system_content = SYSTEM_PROMPT
@@ -140,7 +141,7 @@ async def _build_data_context(context: Dict[str, Any]) -> str:
     parts = []
 
     try:
-        # Always include top drugs summary
+        # Always include top drugs summary per platform
         top_drugs_query = """
         SELECT scientific_name, SUM(total_mentions) as mentions
         FROM (
@@ -154,17 +155,42 @@ async def _build_data_context(context: Dict[str, Any]) -> str:
         )
         GROUP BY scientific_name
         ORDER BY mentions DESC
-        LIMIT 10
+        LIMIT 20
         """
-        top_drugs = bq_service.execute_query(top_drugs_query, max_results=10)
+        top_drugs = bq_service.execute_query(top_drugs_query, max_results=20)
         if top_drugs:
             drug_list = ", ".join(
                 f"{d['scientific_name']} ({d['mentions']} mentions)" for d in top_drugs
             )
             parts.append(f"Top drugs across platforms: {drug_list}")
 
-        # If a specific drug is in context, get its stats
+        # Top TikTok drugs specifically
+        tiktok_drugs_query = """
+        SELECT scientific_name, SUM(video_count) as videos
+        FROM sparkg_gold.tiktok_daily_trends
+        WHERE scientific_name IS NOT NULL
+        GROUP BY scientific_name
+        ORDER BY videos DESC
+        LIMIT 10
+        """
+        tiktok_drugs = bq_service.execute_query(tiktok_drugs_query, max_results=10)
+        if tiktok_drugs:
+            tiktok_list = ", ".join(
+                f"{d['scientific_name']} ({d['videos']} videos)" for d in tiktok_drugs
+            )
+            parts.append(f"Top drugs on TikTok: {tiktok_list}")
+
+        # Extract drug name from question if not in context
         drug = context.get("drug")
+        if not drug:
+            question = context.get("question", "")
+            if top_drugs and question:
+                question_lower = question.lower()
+                for d in top_drugs:
+                    if d["scientific_name"].lower() in question_lower:
+                        drug = d["scientific_name"]
+                        break
+
         if drug:
             drug_query = f"""
             SELECT

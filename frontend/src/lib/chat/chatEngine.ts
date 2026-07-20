@@ -145,6 +145,9 @@ export async function processUserAction(
   let nextNodeId: string
   if (!node) {
     nextNodeId = 'root.start'
+  } else if (action.type === 'submit_text' && !node.showTextInput) {
+    // Free text typed from a menu node — route to LLM
+    nextNodeId = 'free-text.llm-response'
   } else if (typeof node.next === 'function') {
     nextNodeId = node.next(action.value, newState.context)
   } else {
@@ -198,17 +201,17 @@ function updateContext(state: ChatState, value: string, node: FlowNode | undefin
   if (value === 'tiktok-posts') ctx.selectedPlatform = 'tiktok'
   if (value === 'youtube-posts') ctx.selectedPlatform = 'youtube'
 
-  // Free text input (when node has showTextInput and value doesn't match known patterns)
+  // Free text input — capture query from any text submission
   if (
-    node?.showTextInput &&
     !value.startsWith('drug:') &&
     !value.startsWith('category:') &&
-    !['start-over', 'back'].includes(value)
+    !['start-over', 'back'].includes(value) &&
+    (node?.showTextInput || !Object.keys(node?.next || {}).includes(value))
   ) {
     ctx.freeTextQuery = value
-    // If user is in drug-lookup search, treat text as drug name
-    if (node.id === 'drug-lookup.search') {
-      ctx.selectedDrug = value
+    // If user is in drug-lookup search and typed a single word, treat as drug name
+    if (node && node.id === 'drug-lookup.search' && value.trim().split(/\s+/).length === 1) {
+      ctx.selectedDrug = value.trim()
     }
   }
 

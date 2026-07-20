@@ -18,7 +18,20 @@ export async function fetchTopDrugsForChat(
     }
   }
 
-  // Use weekly endpoint (matches dashboard pages) — backend handles time scoping
+  // TikTok: use drugs-breakdown endpoint (weekly trends table is unreliable for tiktok)
+  if (platform === 'tiktok') {
+    const res = await fetch(`${API_BASE}/dashboard/tiktok/drugs-breakdown`)
+    const data = await res.json()
+    const drugs = (data || [])
+      .slice(0, 10)
+      .map((d: { scientific_name: string; video_count: number }) => ({
+        name: d.scientific_name,
+        value: d.video_count,
+      }))
+    return { drugs }
+  }
+
+  // Reddit / YouTube: use weekly trends endpoint
   const weeks = Math.max(Math.ceil(days / 7), 2)
   const res = await fetch(
     `${API_BASE}/dashboard/trends/weekly?weeks=${weeks}&platform=${platform}`
