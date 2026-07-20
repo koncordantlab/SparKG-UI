@@ -358,7 +358,7 @@ async def get_tiktok_posts(
             video_id,
             description,
             author_username,
-            author_display_name,
+            author_username as author_display_name,
             view_count,
             like_count,
             comment_count,
@@ -367,7 +367,7 @@ async def get_tiktok_posts(
             url,
             scientific_name,
             0.0 as substance_use_confidence,
-            transcript
+            CAST(NULL AS STRING) as transcript
         FROM sparkg_gold.tiktok_top_videos
         WHERE {where_clause}
         ORDER BY published_at DESC
@@ -550,7 +550,10 @@ async def get_drug_stats(drug_name: str):
             WHERE LOWER(scientific_name) = LOWER('{drug_name}')
         ),
         drug_info AS (
-            SELECT category, common_terms, controlled_substance
+            SELECT
+                MAX(category) as category,
+                MAX(common_terms) as common_terms,
+                MAX(CAST(controlled_substance AS STRING)) as controlled_substance
             FROM sparkg_gold.drug_terms
             WHERE LOWER(scientific_name) = LOWER('{drug_name}')
         )
@@ -568,7 +571,7 @@ async def get_drug_stats(drug_name: str):
             y.youtube_videos,
             y.youtube_views,
             y.youtube_likes
-        FROM drug_info d, reddit_stats r, tiktok_stats t, youtube_stats y
+        FROM reddit_stats r, tiktok_stats t, youtube_stats y, drug_info d
         """
         results = bq_service.execute_query(query, 1)
         return results[0] if results else {}
