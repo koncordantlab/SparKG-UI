@@ -145,22 +145,19 @@ export async function processUserAction(
   let nextNodeId: string
   if (!node) {
     nextNodeId = 'root.start'
-  } else if (action.type === 'submit_text' && !node.showTextInput) {
-    // Intent detection: free text from a menu node — try to route to data before LLM fallback
-    const intent = detectVideoIntent(action.value, newState.context)
+  } else if (action.type === 'submit_text') {
+    // Always try intent detection first for any free-text submission
+    const intent = detectVideoIntent(action.value, newState.context) as (Partial<FlowContext> & { _drugStatsOnly?: boolean }) | null
     if (intent) {
-      newState = { ...newState, context: { ...newState.context, ...intent } }
-      nextNodeId = 'drug-lookup.show-posts'
+      const { _drugStatsOnly, ...ctxUpdate } = intent
+      newState = { ...newState, context: { ...newState.context, ...ctxUpdate } }
+      nextNodeId = _drugStatsOnly ? 'drug-lookup.show-drug-stats' : 'drug-lookup.show-posts'
+    } else if (typeof node.next === 'function') {
+      nextNodeId = node.next(action.value, newState.context)
+    } else if (node.next[action.value]) {
+      nextNodeId = node.next[action.value]
     } else {
-      nextNodeId = 'free-text.llm-response'
-    }
-  } else if (action.type === 'submit_text' && node.showTextInput && node.id === 'free-text.input') {
-    // Intent detection for the free-text input node too
-    const intent = detectVideoIntent(action.value, newState.context)
-    if (intent) {
-      newState = { ...newState, context: { ...newState.context, ...intent } }
-      nextNodeId = 'drug-lookup.show-posts'
-    } else {
+      // No match — go to LLM
       nextNodeId = 'free-text.llm-response'
     }
   } else if (typeof node.next === 'function') {
@@ -252,14 +249,20 @@ const PLATFORM_KEYWORDS: Record<string, FlowContext['selectedPlatform']> = {
   yt: 'youtube',
 }
 
+const STOP_WORDS = new Set([
+  'get', 'me', 'the', 'show', 'find', 'list', 'fetch', 'see', 'display', 'browse',
+  'give', 'containing', 'about', 'with', 'for', 'on', 'in', 'videos', 'video',
+  'posts', 'post', 'clips', 'clip', 'content', 'results', 'related', 'to',
+  'tiktok', 'reddit', 'youtube', 'all', 'platforms', 'a', 'an', 'use', 'using',
+  'drug', 'drugs', 'data', 'info', 'information', 'trend', 'trends', 'what', 'how',
+  'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+])
+
 function detectVideoIntent(
   query: string,
   ctx: FlowContext
 ): Partial<FlowContext> | null {
-  const q = query.toLowerCase()
-
-  const hasVideoIntent = VIDEO_INTENT_KEYWORDS.some(kw => q.includes(kw))
-  if (!hasVideoIntent) return null
+  const q = query.toLowerCase().trim()
 
   // Detect platform from query or fall back to existing context
   let platform: FlowContext['selectedPlatform'] = ctx.selectedPlatform || 'tiktok'
@@ -270,29 +273,33 @@ function detectVideoIntent(
     }
   }
 
-  // Extract drug name: strip common filler words and pick the remaining content word(s)
-  const STOP_WORDS = new Set([
-    'get', 'me', 'the', 'show', 'find', 'list', 'fetch', 'see', 'display', 'browse',
-    'give', 'containing', 'about', 'with', 'for', 'on', 'in', 'videos', 'video',
-    'posts', 'post', 'clips', 'clip', 'content', 'results', 'related', 'to',
-    'tiktok', 'reddit', 'youtube', 'all', 'platforms', 'a', 'an',
-  ])
-
+  // Extract candidate drug words (strip stop words and short tokens)
   const words = q
     .replace(/[^\w\s]/g, '')
     .split(/\s+/)
-    .filter(w => w.length > 1 && !STOP_WORDS.has(w))
+    .filter(w => w.length >= 3 && !STOP_WORDS.has(w))
 
   if (words.length === 0) return null
 
-  // Use the longest remaining word as the likely drug name (keeps multi-syllable names over "use")
+  // Use the longest remaining word as the drug name
   const drugName = words.sort((a, b) => b.length - a.length)[0]
   if (drugName.length < 3) return null
 
-  // Capitalize first letter to match stored drug names
   const selectedDrug = drugName.charAt(0).toUpperCase() + drugName.slice(1)
+  const hasVideoIntent = VIDEO_INTENT_KEYWORDS.some(kw => q.includes(kw))
 
-  return { selectedPlatform: platform, selectedDrug }
+  // If explicit video/show intent — go straight to posts list
+  if (hasVideoIntent) {
+    return { selectedPlatform: platform, selectedDrug }
+  }
+
+  // Bare drug name (1-2 meaningful words, no question words) — go to drug stats
+  const hasQuestionWords = /^(what|how|why|when|where|who|tell|explain|describe|is |are |does )/.test(q)
+  if (!hasQuestionWords && words.length <= 3) {
+    return { selectedPlatform: platform, selectedDrug, _drugStatsOnly: true } as Partial<FlowContext> & { _drugStatsOnly?: boolean }
+  }
+
+  return null
 }
 
 function addBotMessage(
