@@ -105,7 +105,7 @@ export default function SponsorReviewPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Sponsor Review Table</h1>
         <p className="text-gray-500">
-          Batch review of all {total.toLocaleString()} videos — one row per video with full pipeline status.
+          Batch review of all {total.toLocaleString()} videos, one row per video with full pipeline status.
         </p>
       </div>
 
@@ -308,7 +308,7 @@ export default function SponsorReviewPage() {
             Previous
           </button>
           <span className="text-gray-600 text-sm">
-            Page {page + 1} of {totalPages} — {total.toLocaleString()} total videos
+            Page {page + 1} of {totalPages} ({total.toLocaleString()} total videos)
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}

@@ -110,6 +110,12 @@ const navSections: NavSection[] = [
     ],
   },
   {
+    title: 'RESOURCES',
+    items: [
+      { label: 'Education', href: '/education', icon: <PostsIcon /> },
+    ],
+  },
+  {
     title: 'ASSISTANT',
     items: [
       { label: 'Chat', href: '/chat', icon: <ChatIcon /> },
