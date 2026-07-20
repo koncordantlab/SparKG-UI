@@ -146,8 +146,23 @@ export async function processUserAction(
   if (!node) {
     nextNodeId = 'root.start'
   } else if (action.type === 'submit_text' && !node.showTextInput) {
-    // Free text typed from a menu node — route to LLM
-    nextNodeId = 'free-text.llm-response'
+    // Intent detection: free text from a menu node — try to route to data before LLM fallback
+    const intent = detectVideoIntent(action.value, newState.context)
+    if (intent) {
+      newState = { ...newState, context: { ...newState.context, ...intent } }
+      nextNodeId = 'drug-lookup.show-posts'
+    } else {
+      nextNodeId = 'free-text.llm-response'
+    }
+  } else if (action.type === 'submit_text' && node.showTextInput && node.id === 'free-text.input') {
+    // Intent detection for the free-text input node too
+    const intent = detectVideoIntent(action.value, newState.context)
+    if (intent) {
+      newState = { ...newState, context: { ...newState.context, ...intent } }
+      nextNodeId = 'drug-lookup.show-posts'
+    } else {
+      nextNodeId = 'free-text.llm-response'
+    }
   } else if (typeof node.next === 'function') {
     nextNodeId = node.next(action.value, newState.context)
   } else {
@@ -221,6 +236,63 @@ function updateContext(state: ChatState, value: string, node: FlowNode | undefin
   }
 
   return { ...state, context: ctx }
+}
+
+const VIDEO_INTENT_KEYWORDS = [
+  'video', 'videos', 'post', 'posts', 'show', 'get', 'find', 'list', 'fetch',
+  'see', 'display', 'browse', 'content', 'clips', 'results',
+]
+
+const PLATFORM_KEYWORDS: Record<string, FlowContext['selectedPlatform']> = {
+  tiktok: 'tiktok',
+  'tik tok': 'tiktok',
+  reddit: 'reddit',
+  youtube: 'youtube',
+  'you tube': 'youtube',
+  yt: 'youtube',
+}
+
+function detectVideoIntent(
+  query: string,
+  ctx: FlowContext
+): Partial<FlowContext> | null {
+  const q = query.toLowerCase()
+
+  const hasVideoIntent = VIDEO_INTENT_KEYWORDS.some(kw => q.includes(kw))
+  if (!hasVideoIntent) return null
+
+  // Detect platform from query or fall back to existing context
+  let platform: FlowContext['selectedPlatform'] = ctx.selectedPlatform || 'tiktok'
+  for (const [kw, p] of Object.entries(PLATFORM_KEYWORDS)) {
+    if (q.includes(kw)) {
+      platform = p
+      break
+    }
+  }
+
+  // Extract drug name: strip common filler words and pick the remaining content word(s)
+  const STOP_WORDS = new Set([
+    'get', 'me', 'the', 'show', 'find', 'list', 'fetch', 'see', 'display', 'browse',
+    'give', 'containing', 'about', 'with', 'for', 'on', 'in', 'videos', 'video',
+    'posts', 'post', 'clips', 'clip', 'content', 'results', 'related', 'to',
+    'tiktok', 'reddit', 'youtube', 'all', 'platforms', 'a', 'an',
+  ])
+
+  const words = q
+    .replace(/[^\w\s]/g, '')
+    .split(/\s+/)
+    .filter(w => w.length > 1 && !STOP_WORDS.has(w))
+
+  if (words.length === 0) return null
+
+  // Use the longest remaining word as the likely drug name (keeps multi-syllable names over "use")
+  const drugName = words.sort((a, b) => b.length - a.length)[0]
+  if (drugName.length < 3) return null
+
+  // Capitalize first letter to match stored drug names
+  const selectedDrug = drugName.charAt(0).toUpperCase() + drugName.slice(1)
+
+  return { selectedPlatform: platform, selectedDrug }
 }
 
 function addBotMessage(
