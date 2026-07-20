@@ -1,0 +1,2911 @@
+[
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6803865388619730182",
+      "platform": "tiktok",
+      "url": "https://www.tiktokv.com/share/video/6803865388619730182/",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6803865388619730182",
+      "url": "https://www.tiktokv.com/share/video/6803865388619730182/",
+      "detected_drug": "MDMA (Ecstasy)",
+      "matched_surface_term": "ecstasy",
+      "drug_confidence": 0.82,
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 3,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "needs_human_validation",
+      "pending_review_count": 4,
+      "completeness_score": 0.778
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system links this video to MDMA (Ecstasy) and assigns misuse-related evidence.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "Human review is recommended before using this item as validated evidence.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "ecstasy",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "My heart went. You're fucking lying. Let me see. When a random guy at a rave says he has ecstasy"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "review_required",
+        "headline": "MDMA (Ecstasy)",
+        "details": [
+          "Surface term: ecstasy",
+          "Effects: ",
+          "Legal/status field: Schedule I (DEA Diversion Control Division; Rosalind Franklin University)"
+        ],
+        "confidence": 0.82
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 2: Misuse-related evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "review_required",
+        "headline": "3 OAV triples, 0 ontology mappings",
+        "details": [
+          "Top triple: MDMA (Ecstasy) — mentioned_in — social_media_post",
+          "Top ontology term: not available"
+        ],
+        "confidence": 0.82
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "review_required",
+        "headline": "Review queue pending",
+        "details": [
+          "Pending queue count: 4",
+          "Completeness score: 0.778",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [
+      {
+        "matched_surface_term": "ecstasy",
+        "canonical_drug_name": "MDMA (Ecstasy)",
+        "match_source": "alias_enrichment",
+        "assignment_status": "MATCHED_ALIAS_ENRICHMENT",
+        "confidence": 0.82,
+        "needs_human_validation": true,
+        "context_snippet": "my heart went you re fucking lying let me see when a random guy at a rave says he has ecstasy",
+        "created_provisional": false,
+        "properties": {
+          "name": "MDMA (Ecstasy)",
+          "known_synonyms": [
+            "Ecstasy",
+            "Molly"
+          ],
+          "pharmacology": "Empathogen‑stimulant (increases serotonin; dopamine; norepinephrine release)",
+          "legal_status": "Schedule I (DEA Diversion Control Division; Rosalind Franklin University)",
+          "aliases": [
+            "Ecstasy",
+            "Molly",
+            "E",
+            "X",
+            "XTC",
+            "Disco Biscuit",
+            "Peace",
+            "Adam",
+            "Beans",
+            "Biscuit",
+            "Clarity",
+            "Eve",
+            "Go",
+            "Hug Drug",
+            "Lover’s Speed",
+            "MDMA",
+            "STP"
+          ],
+          "emojis": "💃🍬❌⚡💊❤️☣🤯",
+          "pubchem_cid": "1615",
+          "molecular_formula": "C11H15NO2",
+          "molecular_weight": 193.24
+        }
+      }
+    ],
+    "label_assignment": {
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [
+      {
+        "triple_id": "property_projection:6803865388619730182:mdma ecstasy:mentioned_in",
+        "object_text": "MDMA (Ecstasy)",
+        "attribute": "mentioned_in",
+        "value_text": "social_media_post",
+        "source_modality": "drug_term_grounding",
+        "context_snippet": "my heart went you re fucking lying let me see when a random guy at a rave says he has ecstasy",
+        "confidence": 0.82,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6803865388619730182:mdma ecstasy:has_pharmacology",
+        "object_text": "MDMA (Ecstasy)",
+        "attribute": "has_pharmacology",
+        "value_text": "Empathogen‑stimulant (increases serotonin; dopamine; norepinephrine release)",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "my heart went you re fucking lying let me see when a random guy at a rave says he has ecstasy",
+        "confidence": 0.72,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6803865388619730182:mdma ecstasy:has_legal_status",
+        "object_text": "MDMA (Ecstasy)",
+        "attribute": "has_legal_status",
+        "value_text": "Schedule I (DEA Diversion Control Division; Rosalind Franklin University)",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "my heart went you re fucking lying let me see when a random guy at a rave says he has ecstasy",
+        "confidence": 0.72,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      }
+    ],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "query_term": "ecstasy",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "whisper_asr": "My heart went. You're fucking lying. Let me see.",
+      "ocr": "When a random guy at a rave says he has ecstasy",
+      "final_transcript": "My heart went. You're fucking lying. Let me see.",
+      "final_ocr": "When a random guy at a rave says he has ecstasy",
+      "final_text_for_pipeline": "My heart went. You're fucking lying. Let me see. When a random guy at a rave says he has ecstasy"
+    },
+    "validation": {
+      "queue_items": [
+        {
+          "target_type": "drug_property_assignment",
+          "status": "pending",
+          "context_snippet": "my heart went you re fucking lying let me see when a random guy at a rave says he has ecstasy",
+          "reason": "ambiguous_alias_or_provisional_property_grounding"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6803865388619730182:mdma ecstasy:mentioned_in",
+          "status": "pending",
+          "context_snippet": "my heart went you re fucking lying let me see when a random guy at a rave says he has ecstasy",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6803865388619730182:mdma ecstasy:has_pharmacology",
+          "status": "pending",
+          "context_snippet": "my heart went you re fucking lying let me see when a random guy at a rave says he has ecstasy",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6803865388619730182:mdma ecstasy:has_legal_status",
+          "status": "pending",
+          "context_snippet": "my heart went you re fucking lying let me see when a random guy at a rave says he has ecstasy",
+          "reason": "property_derived_oav_candidate_requires_review"
+        }
+      ],
+      "summary": {
+        "needs_human_validation": true,
+        "pending_queue_count": 4,
+        "property_assignments_needing_review": 1,
+        "oav_triples_needing_review": 3,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.778,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": true,
+        "oav_triples": true,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6831059637354220805",
+      "platform": "tiktok",
+      "url": "https://www.tiktokv.com/share/video/6831059637354220805/",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6831059637354220805",
+      "url": "https://www.tiktokv.com/share/video/6831059637354220805/",
+      "detected_drug": "Cocaine",
+      "matched_surface_term": "coke",
+      "drug_confidence": 0.82,
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 5,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "needs_human_validation",
+      "pending_review_count": 6,
+      "completeness_score": 0.778
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system links this video to Cocaine and assigns misuse-related evidence.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "Human review is recommended before using this item as validated evidence.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "coke",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "uh do we have any coke?\" shey"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "review_required",
+        "headline": "Cocaine",
+        "details": [
+          "Surface term: coke",
+          "Effects: Euphoria; increased energy; alertness; elevated heart rate; and blood pressure. Can cause anxiety; paranoia; and agitation. Crack cocaine provides intense but short-lived effects.; Increased energy; euphoria; anxiety; c…",
+          "Legal/status field: Schedule II (high abuse potential; limited medical use as a topical anesthetic). Illegal for recreational use since 1914.; Schedule II (USA); Schedule II (). Illegal for recreatio…"
+        ],
+        "confidence": 0.82
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 2: Misuse-related evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "review_required",
+        "headline": "5 OAV triples, 0 ontology mappings",
+        "details": [
+          "Top triple: Cocaine — mentioned_in — social_media_post",
+          "Top ontology term: not available"
+        ],
+        "confidence": 0.82
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "review_required",
+        "headline": "Review queue pending",
+        "details": [
+          "Pending queue count: 6",
+          "Completeness score: 0.778",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [
+      {
+        "matched_surface_term": "coke",
+        "canonical_drug_name": "Cocaine",
+        "match_source": "alias_enrichment",
+        "assignment_status": "MATCHED_ALIAS_ENRICHMENT",
+        "confidence": 0.82,
+        "needs_human_validation": true,
+        "context_snippet": "uh do we have any coke shey",
+        "created_provisional": false,
+        "properties": {
+          "name": "Cocaine",
+          "known_synonyms": [
+            "Candy Flipping (with LSD), Cocoa Puffs (with marijuana), Flamethrowers (with methamphetamine), Snow, Blow, Nose Candy, White Powder"
+          ],
+          "pharmacology": "Stimulant derived from coca plant leaves; cocaine hydrochloride is the primary active compound. Increases dopamine levels in the brain by blocking reuptake. Administered by snorting; injecting; or smoking (as crack cocaine).; Stimulant blocking dopamine reuptake; increasing dopamine levels.",
+          "effects": "Euphoria; increased energy; alertness; elevated heart rate; and blood pressure. Can cause anxiety; paranoia; and agitation. Crack cocaine provides intense but short-lived effects.; Increased energy; euphoria; anxiety; cardiovascular issues.",
+          "toxicity_and_harm": "High risk of addiction; overdose can cause cardiac arrest; seizures; or stroke. Chronic use leads to heart damage; nasal tissue damage (if snorted); and mental health issues like paranoia. Mixing with other substances (e.g.; heroin; alcohol) increases overdose risk.; Addiction; psychosis; cardiovascular complications; nasal damage (if snorted).; and mental health issues like paranoia. high abuse potential; limited medical use as a topical anesthetic. Mixing with other substances (e.g.",
+          "legal_status": "Schedule II (high abuse potential; limited medical use as a topical anesthetic). Illegal for recreational use since 1914.; Schedule II (USA); Schedule II (). Illegal for recreational use since 1914.",
+          "aliases": [
+            "Adidas",
+            "Apache",
+            "Aunt Nora",
+            "Belushi (with heroin)",
+            "Bernice",
+            "Bump",
+            "Death Valley",
+            "Diesel",
+            "Diamonds",
+            "Florida Snow",
+            "Ice Cream",
+            "Jump Rope",
+            "Mona Lisa",
+            "Stardust",
+            "Superman",
+            "Tequila",
+            "Toot",
+            "Zapato",
+            "White Girl",
+            "White Goat",
+            "White Horse",
+            "White Shirt",
+            "Cocaine hydrochloride",
+            "Methyl benzoylecgonine"
+          ],
+          "emojis": "❄️🌨️⛄💎🎱🔑😛🐡🥥❄🌨🍚🤧"
+        }
+      }
+    ],
+    "label_assignment": {
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [
+      {
+        "triple_id": "property_projection:6831059637354220805:cocaine:mentioned_in",
+        "object_text": "Cocaine",
+        "attribute": "mentioned_in",
+        "value_text": "social_media_post",
+        "source_modality": "drug_term_grounding",
+        "context_snippet": "uh do we have any coke shey",
+        "confidence": 0.82,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6831059637354220805:cocaine:has_pharmacology",
+        "object_text": "Cocaine",
+        "attribute": "has_pharmacology",
+        "value_text": "Stimulant derived from coca plant leaves; cocaine hydrochloride is the primary active compound. Increases dopamine levels in the brain by blocking reuptake. Administered by snorting; injecting; or smoking (as crack cocaine).; Stimulant blocking dopamine reuptake; increasing dopamine levels.",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "uh do we have any coke shey",
+        "confidence": 0.72,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6831059637354220805:cocaine:has_effects",
+        "object_text": "Cocaine",
+        "attribute": "has_effects",
+        "value_text": "Euphoria; increased energy; alertness; elevated heart rate; and blood pressure. Can cause anxiety; paranoia; and agitation. Crack cocaine provides intense but short-lived effects.; Increased energy; euphoria; anxiety; cardiovascular issues.",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "uh do we have any coke shey",
+        "confidence": 0.72,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6831059637354220805:cocaine:has_toxicity_and_harm_potential",
+        "object_text": "Cocaine",
+        "attribute": "has_toxicity_and_harm_potential",
+        "value_text": "High risk of addiction; overdose can cause cardiac arrest; seizures; or stroke. Chronic use leads to heart damage; nasal tissue damage (if snorted); and mental health issues like paranoia. Mixing with other substances (e.g.; heroin; alcohol) increases overdose risk.; Addiction; psychosis; cardiovascular complications; nasal damage (if snorted).; and mental health issues like paranoia. high abuse potential; limited medical use as a topical anesthetic. Mixing with other substances (e.g.",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "uh do we have any coke shey",
+        "confidence": 0.72,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6831059637354220805:cocaine:has_legal_status",
+        "object_text": "Cocaine",
+        "attribute": "has_legal_status",
+        "value_text": "Schedule II (high abuse potential; limited medical use as a topical anesthetic). Illegal for recreational use since 1914.; Schedule II (USA); Schedule II (). Illegal for recreational use since 1914.",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "uh do we have any coke shey",
+        "confidence": 0.72,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      }
+    ],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "query_term": "coke",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "ocr": "uh do we have any coke?\" shey",
+      "final_ocr": "uh do we have any coke?\" shey",
+      "final_text_for_pipeline": "uh do we have any coke?\" shey"
+    },
+    "validation": {
+      "queue_items": [
+        {
+          "target_type": "drug_property_assignment",
+          "status": "pending",
+          "context_snippet": "uh do we have any coke shey",
+          "reason": "ambiguous_alias_or_provisional_property_grounding"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6831059637354220805:cocaine:mentioned_in",
+          "status": "pending",
+          "context_snippet": "uh do we have any coke shey",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6831059637354220805:cocaine:has_pharmacology",
+          "status": "pending",
+          "context_snippet": "uh do we have any coke shey",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6831059637354220805:cocaine:has_effects",
+          "status": "pending",
+          "context_snippet": "uh do we have any coke shey",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6831059637354220805:cocaine:has_toxicity_and_harm_potential",
+          "status": "pending",
+          "context_snippet": "uh do we have any coke shey",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6831059637354220805:cocaine:has_legal_status",
+          "status": "pending",
+          "context_snippet": "uh do we have any coke shey",
+          "reason": "property_derived_oav_candidate_requires_review"
+        }
+      ],
+      "summary": {
+        "needs_human_validation": true,
+        "pending_queue_count": 6,
+        "property_assignments_needing_review": 1,
+        "oav_triples_needing_review": 5,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.778,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": true,
+        "oav_triples": true,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6842741582781893894",
+      "platform": "tiktok",
+      "url": "https://www.tiktokv.com/share/video/6842741582781893894/",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6842741582781893894",
+      "url": "https://www.tiktokv.com/share/video/6842741582781893894/",
+      "detected_drug": "MDMA (Ecstasy)",
+      "matched_surface_term": "e pills",
+      "drug_confidence": 0.82,
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 3,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "needs_human_validation",
+      "pending_review_count": 4,
+      "completeness_score": 0.778
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system links this video to MDMA (Ecstasy) and assigns misuse-related evidence.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "Human review is recommended before using this item as validated evidence.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "e pills",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "You know, When the E-pills start kicking in"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "review_required",
+        "headline": "MDMA (Ecstasy)",
+        "details": [
+          "Surface term: e pills",
+          "Effects: ",
+          "Legal/status field: Schedule I (DEA Diversion Control Division; Rosalind Franklin University)"
+        ],
+        "confidence": 0.82
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 2: Misuse-related evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "review_required",
+        "headline": "3 OAV triples, 0 ontology mappings",
+        "details": [
+          "Top triple: MDMA (Ecstasy) — mentioned_in — social_media_post",
+          "Top ontology term: not available"
+        ],
+        "confidence": 0.82
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "review_required",
+        "headline": "Review queue pending",
+        "details": [
+          "Pending queue count: 4",
+          "Completeness score: 0.778",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [
+      {
+        "matched_surface_term": "e pills",
+        "canonical_drug_name": "MDMA (Ecstasy)",
+        "match_source": "alias_enrichment",
+        "assignment_status": "MATCHED_ALIAS_ENRICHMENT",
+        "confidence": 0.82,
+        "needs_human_validation": true,
+        "context_snippet": "you know when the e pills start kicking in",
+        "created_provisional": false,
+        "properties": {
+          "name": "MDMA (Ecstasy)",
+          "known_synonyms": [
+            "Ecstasy",
+            "Molly"
+          ],
+          "pharmacology": "Empathogen‑stimulant (increases serotonin; dopamine; norepinephrine release)",
+          "legal_status": "Schedule I (DEA Diversion Control Division; Rosalind Franklin University)",
+          "aliases": [
+            "Ecstasy",
+            "Molly",
+            "E",
+            "X",
+            "XTC",
+            "Disco Biscuit",
+            "Peace",
+            "Adam",
+            "Beans",
+            "Biscuit",
+            "Clarity",
+            "Eve",
+            "Go",
+            "Hug Drug",
+            "Lover’s Speed",
+            "MDMA",
+            "STP"
+          ],
+          "emojis": "💃🍬❌⚡💊❤️☣🤯",
+          "pubchem_cid": "1615",
+          "molecular_formula": "C11H15NO2",
+          "molecular_weight": 193.24
+        }
+      }
+    ],
+    "label_assignment": {
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [
+      {
+        "triple_id": "property_projection:6842741582781893894:mdma ecstasy:mentioned_in",
+        "object_text": "MDMA (Ecstasy)",
+        "attribute": "mentioned_in",
+        "value_text": "social_media_post",
+        "source_modality": "drug_term_grounding",
+        "context_snippet": "you know when the e pills start kicking in",
+        "confidence": 0.82,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6842741582781893894:mdma ecstasy:has_pharmacology",
+        "object_text": "MDMA (Ecstasy)",
+        "attribute": "has_pharmacology",
+        "value_text": "Empathogen‑stimulant (increases serotonin; dopamine; norepinephrine release)",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "you know when the e pills start kicking in",
+        "confidence": 0.72,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6842741582781893894:mdma ecstasy:has_legal_status",
+        "object_text": "MDMA (Ecstasy)",
+        "attribute": "has_legal_status",
+        "value_text": "Schedule I (DEA Diversion Control Division; Rosalind Franklin University)",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "you know when the e pills start kicking in",
+        "confidence": 0.72,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      }
+    ],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "query_term": "e pills",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "whisper_asr": "You know,",
+      "ocr": "When the E-pills start kicking in",
+      "final_transcript": "You know,",
+      "final_ocr": "When the E-pills start kicking in",
+      "final_text_for_pipeline": "You know, When the E-pills start kicking in"
+    },
+    "validation": {
+      "queue_items": [
+        {
+          "target_type": "drug_property_assignment",
+          "status": "pending",
+          "context_snippet": "you know when the e pills start kicking in",
+          "reason": "ambiguous_alias_or_provisional_property_grounding"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6842741582781893894:mdma ecstasy:mentioned_in",
+          "status": "pending",
+          "context_snippet": "you know when the e pills start kicking in",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6842741582781893894:mdma ecstasy:has_pharmacology",
+          "status": "pending",
+          "context_snippet": "you know when the e pills start kicking in",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6842741582781893894:mdma ecstasy:has_legal_status",
+          "status": "pending",
+          "context_snippet": "you know when the e pills start kicking in",
+          "reason": "property_derived_oav_candidate_requires_review"
+        }
+      ],
+      "summary": {
+        "needs_human_validation": true,
+        "pending_queue_count": 4,
+        "property_assignments_needing_review": 1,
+        "oav_triples_needing_review": 3,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.778,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": true,
+        "oav_triples": true,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6852001284313140485",
+      "platform": "tiktok",
+      "url": "https://www.tiktokv.com/share/video/6852001284313140485/",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6852001284313140485",
+      "url": "https://www.tiktokv.com/share/video/6852001284313140485/",
+      "detected_drug": null,
+      "matched_surface_term": null,
+      "drug_confidence": null,
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 0,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "no_current_flag",
+      "pending_review_count": 0,
+      "completeness_score": 0.556
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system assigns misuse-related evidence, but no chemical-table drug entity is grounded yet.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "No immediate review flag is present, but it can still be sampled for quality control.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "existing_year2_dataset",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "Lana is a girl No negitie energy HIIV Just enjoy your Dnd reflege trip"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "not_available_yet",
+        "headline": "No chemical-table match",
+        "details": [
+          "No canonical drug-property record is attached yet."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 2: Misuse-related evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "not_available_yet",
+        "headline": "0 OAV triples, 0 ontology mappings",
+        "details": [
+          "No OAV triple attached yet.",
+          "Top ontology term: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "complete",
+        "headline": "Ready for sampling / no current flag",
+        "details": [
+          "Pending queue count: 0",
+          "Completeness score: 0.556",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [],
+    "label_assignment": {
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "whisper_asr": "Lana is a girl",
+      "ocr": "No negitie energy HIIV Just enjoy your Dnd reflege trip",
+      "final_transcript": "Lana is a girl",
+      "final_ocr": "No negitie energy HIIV Just enjoy your Dnd reflege trip",
+      "final_text_for_pipeline": "Lana is a girl No negitie energy HIIV Just enjoy your Dnd reflege trip"
+    },
+    "validation": {
+      "queue_items": [],
+      "summary": {
+        "needs_human_validation": false,
+        "pending_queue_count": 0,
+        "property_assignments_needing_review": 0,
+        "oav_triples_needing_review": 0,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.556,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": false,
+        "oav_triples": false,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6852365460139183365",
+      "platform": "tiktok",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6852365460139183365",
+      "url": null,
+      "detected_drug": null,
+      "matched_surface_term": null,
+      "drug_confidence": null,
+      "auto_label": 0,
+      "auto_label_text": "No clear misuse evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 0,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "no_current_flag",
+      "pending_review_count": 0,
+      "completeness_score": 0.556
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system assigns no clear misuse evidence, but no chemical-table drug entity is grounded yet.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "No immediate review flag is present, but it can still be sampled for quality control.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "existing_year2_dataset",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "I make a motherfucker say, oh, yeah, I'm cold as a lion with no hair. If you ever see me fighting in the forest with a grizzly bear, help the bear. That bitch …"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "not_available_yet",
+        "headline": "No chemical-table match",
+        "details": [
+          "No canonical drug-property record is attached yet."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 0: No clear misuse evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "not_available_yet",
+        "headline": "0 OAV triples, 0 ontology mappings",
+        "details": [
+          "No OAV triple attached yet.",
+          "Top ontology term: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "complete",
+        "headline": "Ready for sampling / no current flag",
+        "details": [
+          "Pending queue count: 0",
+          "Completeness score: 0.556",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [],
+    "label_assignment": {
+      "auto_label": 0,
+      "auto_label_text": "No clear misuse evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "whisper_asr": "I make a motherfucker say, oh, yeah, I'm cold as a lion with no hair. If you ever see me fighting in the forest with a grizzly bear, help the bear. That bitch gonna need it.",
+      "final_transcript": "I make a motherfucker say, oh, yeah, I'm cold as a lion with no hair. If you ever see me fighting in the forest with a grizzly bear, help the bear. That bitch gonna need it.",
+      "final_text_for_pipeline": "I make a motherfucker say, oh, yeah, I'm cold as a lion with no hair. If you ever see me fighting in the forest with a grizzly bear, help the bear. That bitch gonna need it."
+    },
+    "validation": {
+      "queue_items": [],
+      "summary": {
+        "needs_human_validation": false,
+        "pending_queue_count": 0,
+        "property_assignments_needing_review": 0,
+        "oav_triples_needing_review": 0,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.556,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": false,
+        "oav_triples": false,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6855074530247953669",
+      "platform": "tiktok",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6855074530247953669",
+      "url": null,
+      "detected_drug": null,
+      "matched_surface_term": null,
+      "drug_confidence": null,
+      "auto_label": 0,
+      "auto_label_text": "No clear misuse evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 0,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "no_current_flag",
+      "pending_review_count": 0,
+      "completeness_score": 0.556
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system assigns no clear misuse evidence, but no chemical-table drug entity is grounded yet.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "No immediate review flag is present, but it can still be sampled for quality control.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "existing_year2_dataset",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "does loneliness affect you? Loneliness is an epidemic that affects your physical and mental health. Loneliness has long-term health consequences. When you're l…"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "not_available_yet",
+        "headline": "No chemical-table match",
+        "details": [
+          "No canonical drug-property record is attached yet."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 0: No clear misuse evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "not_available_yet",
+        "headline": "0 OAV triples, 0 ontology mappings",
+        "details": [
+          "No OAV triple attached yet.",
+          "Top ontology term: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "complete",
+        "headline": "Ready for sampling / no current flag",
+        "details": [
+          "Pending queue count: 0",
+          "Completeness score: 0.556",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [],
+    "label_assignment": {
+      "auto_label": 0,
+      "auto_label_text": "No clear misuse evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "whisper_asr": "does loneliness affect you? Loneliness is an epidemic that affects your physical and mental health. Loneliness has long-term health consequences. When you're lonely, your stress hormones increase. This impairs the function of your brain, compromises your immune system, and increases your risk for heart disease. It can also lead to depression and anxiety. A lot of people are experiencing loneliness, but there's things that will help. Take a break from social media, become more aware of your feelings, do random acts of kindness, and talking to friends and family can help. That's Medicine Explained.",
+      "final_transcript": "does loneliness affect you? Loneliness is an epidemic that affects your physical and mental health. Loneliness has long-term health consequences. When you're lonely, your stress hormones increase. This impairs the function of your brain, compromises your immune system, and increases your risk for heart disease. It can also lead to depression and anxiety. A lot of people are experiencing loneliness, but there's things that will help. Take a break from social media, become more aware of your feelings, do random acts of kindness, and talking to friends and family can help. That's Medicine Explained.",
+      "final_text_for_pipeline": "does loneliness affect you? Loneliness is an epidemic that affects your physical and mental health. Loneliness has long-term health consequences. When you're lonely, your stress hormones increase. This impairs the function of your brain, compromises your immune system, and increases your risk for heart disease. It can also lead to depression and anxiety. A lot of people are experiencing loneliness, but there's things that will help. Take a break from social media, become more aware of your feelings, do random acts of kindness, and talking to friends and family can help. That's Medicine Explained."
+    },
+    "validation": {
+      "queue_items": [],
+      "summary": {
+        "needs_human_validation": false,
+        "pending_queue_count": 0,
+        "property_assignments_needing_review": 0,
+        "oav_triples_needing_review": 0,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.556,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": false,
+        "oav_triples": false,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6879589020280687877",
+      "platform": "tiktok",
+      "url": "https://www.tiktokv.com/share/video/6879589020280687877/"
+    },
+    "summary_columns": {
+      "video_id": "6879589020280687877",
+      "url": "https://www.tiktokv.com/share/video/6879589020280687877/",
+      "detected_drug": null,
+      "matched_surface_term": null,
+      "drug_confidence": null,
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 0,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "no_current_flag",
+      "pending_review_count": 0,
+      "completeness_score": 0.556
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system assigns misuse-related evidence, but no chemical-table drug entity is grounded yet.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "No immediate review flag is present, but it can still be sampled for quality control.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "existing_year2_dataset",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "Fly you at the creep. Full speed. Sepolic alley. Come on me, leave all of your things, yeah."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "not_available_yet",
+        "headline": "No chemical-table match",
+        "details": [
+          "No canonical drug-property record is attached yet."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 2: Misuse-related evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "not_available_yet",
+        "headline": "0 OAV triples, 0 ontology mappings",
+        "details": [
+          "No OAV triple attached yet.",
+          "Top ontology term: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "complete",
+        "headline": "Ready for sampling / no current flag",
+        "details": [
+          "Pending queue count: 0",
+          "Completeness score: 0.556",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [],
+    "label_assignment": {
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "whisper_asr": "Fly you at the creep. Full speed. Sepolic alley. Come on me, leave all of your things, yeah.",
+      "final_transcript": "Fly you at the creep. Full speed. Sepolic alley. Come on me, leave all of your things, yeah.",
+      "final_text_for_pipeline": "Fly you at the creep. Full speed. Sepolic alley. Come on me, leave all of your things, yeah."
+    },
+    "validation": {
+      "queue_items": [],
+      "summary": {
+        "needs_human_validation": false,
+        "pending_queue_count": 0,
+        "property_assignments_needing_review": 0,
+        "oav_triples_needing_review": 0,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.556,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": false,
+        "oav_triples": false,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6886203348345687301",
+      "platform": "tiktok",
+      "url": "https://www.tiktokv.com/share/video/6886203348345687301/",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6886203348345687301",
+      "url": "https://www.tiktokv.com/share/video/6886203348345687301/",
+      "detected_drug": null,
+      "matched_surface_term": null,
+      "drug_confidence": null,
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 0,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "no_current_flag",
+      "pending_review_count": 0,
+      "completeness_score": 0.556
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system assigns misuse-related evidence, but no chemical-table drug entity is grounded yet.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "No immediate review flag is present, but it can still be sampled for quality control.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "existing_year2_dataset",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "my mom blowing"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "not_available_yet",
+        "headline": "No chemical-table match",
+        "details": [
+          "No canonical drug-property record is attached yet."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 2: Misuse-related evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "not_available_yet",
+        "headline": "0 OAV triples, 0 ontology mappings",
+        "details": [
+          "No OAV triple attached yet.",
+          "Top ontology term: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "complete",
+        "headline": "Ready for sampling / no current flag",
+        "details": [
+          "Pending queue count: 0",
+          "Completeness score: 0.556",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [],
+    "label_assignment": {
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "ocr": "my mom blowing",
+      "final_ocr": "my mom blowing",
+      "final_text_for_pipeline": "my mom blowing"
+    },
+    "validation": {
+      "queue_items": [],
+      "summary": {
+        "needs_human_validation": false,
+        "pending_queue_count": 0,
+        "property_assignments_needing_review": 0,
+        "oav_triples_needing_review": 0,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.556,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": false,
+        "oav_triples": false,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6886204715407838469",
+      "platform": "tiktok",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6886204715407838469",
+      "url": null,
+      "detected_drug": null,
+      "matched_surface_term": null,
+      "drug_confidence": null,
+      "auto_label": 0,
+      "auto_label_text": "No clear misuse evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 0,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "no_current_flag",
+      "pending_review_count": 0,
+      "completeness_score": 0.556
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system assigns no clear misuse evidence, but no chemical-table drug entity is grounded yet.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "No immediate review flag is present, but it can still be sampled for quality control.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "existing_year2_dataset",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "whoever sent you this just wants to let you know that you a bitch you always gonna be a bitch"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "not_available_yet",
+        "headline": "No chemical-table match",
+        "details": [
+          "No canonical drug-property record is attached yet."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 0: No clear misuse evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "not_available_yet",
+        "headline": "0 OAV triples, 0 ontology mappings",
+        "details": [
+          "No OAV triple attached yet.",
+          "Top ontology term: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "complete",
+        "headline": "Ready for sampling / no current flag",
+        "details": [
+          "Pending queue count: 0",
+          "Completeness score: 0.556",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [],
+    "label_assignment": {
+      "auto_label": 0,
+      "auto_label_text": "No clear misuse evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "whisper_asr": "whoever sent you this just wants to let you know that you a bitch you always gonna be a bitch",
+      "final_transcript": "whoever sent you this just wants to let you know that you a bitch you always gonna be a bitch",
+      "final_text_for_pipeline": "whoever sent you this just wants to let you know that you a bitch you always gonna be a bitch"
+    },
+    "validation": {
+      "queue_items": [],
+      "summary": {
+        "needs_human_validation": false,
+        "pending_queue_count": 0,
+        "property_assignments_needing_review": 0,
+        "oav_triples_needing_review": 0,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.556,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": false,
+        "oav_triples": false,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6892941050524994822",
+      "platform": "tiktok",
+      "url": "https://www.tiktokv.com/share/video/6892941050524994822/",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6892941050524994822",
+      "url": "https://www.tiktokv.com/share/video/6892941050524994822/",
+      "detected_drug": null,
+      "matched_surface_term": null,
+      "drug_confidence": null,
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 0,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "no_current_flag",
+      "pending_review_count": 0,
+      "completeness_score": 0.556
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system assigns misuse-related evidence, but no chemical-table drug entity is grounded yet.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "No immediate review flag is present, but it can still be sampled for quality control.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "existing_year2_dataset",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "idk ask my mother"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "not_available_yet",
+        "headline": "No chemical-table match",
+        "details": [
+          "No canonical drug-property record is attached yet."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 2: Misuse-related evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "not_available_yet",
+        "headline": "0 OAV triples, 0 ontology mappings",
+        "details": [
+          "No OAV triple attached yet.",
+          "Top ontology term: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "complete",
+        "headline": "Ready for sampling / no current flag",
+        "details": [
+          "Pending queue count: 0",
+          "Completeness score: 0.556",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [],
+    "label_assignment": {
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "ocr": "idk ask my mother",
+      "final_ocr": "idk ask my mother",
+      "final_text_for_pipeline": "idk ask my mother"
+    },
+    "validation": {
+      "queue_items": [],
+      "summary": {
+        "needs_human_validation": false,
+        "pending_queue_count": 0,
+        "property_assignments_needing_review": 0,
+        "oav_triples_needing_review": 0,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.556,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": false,
+        "oav_triples": false,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6894760102717377797",
+      "platform": "tiktok",
+      "url": "https://www.tiktokv.com/share/video/6894760102717377797/",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6894760102717377797",
+      "url": "https://www.tiktokv.com/share/video/6894760102717377797/",
+      "detected_drug": "Cocaine",
+      "matched_surface_term": "blow",
+      "drug_confidence": 0.62,
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 5,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "needs_human_validation",
+      "pending_review_count": 6,
+      "completeness_score": 0.778
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system links this video to Cocaine and assigns misuse-related evidence.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "Human review is recommended before using this item as validated evidence.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "blow",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "When you snorted all the blow the sun came up, and the plug stopped answering"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "review_required",
+        "headline": "Cocaine",
+        "details": [
+          "Surface term: blow",
+          "Effects: Euphoria; increased energy; alertness; elevated heart rate; and blood pressure. Can cause anxiety; paranoia; and agitation. Crack cocaine provides intense but short-lived effects.; Increased energy; euphoria; anxiety; c…",
+          "Legal/status field: Schedule II (high abuse potential; limited medical use as a topical anesthetic). Illegal for recreational use since 1914.; Schedule II (USA); Schedule II (). Illegal for recreatio…"
+        ],
+        "confidence": 0.62
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 2: Misuse-related evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "review_required",
+        "headline": "5 OAV triples, 0 ontology mappings",
+        "details": [
+          "Top triple: Cocaine — mentioned_in — social_media_post",
+          "Top ontology term: not available"
+        ],
+        "confidence": 0.62
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "review_required",
+        "headline": "Review queue pending",
+        "details": [
+          "Pending queue count: 6",
+          "Completeness score: 0.778",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [
+      {
+        "matched_surface_term": "blow",
+        "canonical_drug_name": "Cocaine",
+        "match_source": "alias_enrichment",
+        "assignment_status": "MATCHED_ALIAS_ENRICHMENT",
+        "confidence": 0.62,
+        "needs_human_validation": true,
+        "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+        "created_provisional": false,
+        "properties": {
+          "name": "Cocaine",
+          "known_synonyms": [
+            "Candy Flipping (with LSD), Cocoa Puffs (with marijuana), Flamethrowers (with methamphetamine), Snow, Blow, Nose Candy, White Powder"
+          ],
+          "pharmacology": "Stimulant derived from coca plant leaves; cocaine hydrochloride is the primary active compound. Increases dopamine levels in the brain by blocking reuptake. Administered by snorting; injecting; or smoking (as crack cocaine).; Stimulant blocking dopamine reuptake; increasing dopamine levels.",
+          "effects": "Euphoria; increased energy; alertness; elevated heart rate; and blood pressure. Can cause anxiety; paranoia; and agitation. Crack cocaine provides intense but short-lived effects.; Increased energy; euphoria; anxiety; cardiovascular issues.",
+          "toxicity_and_harm": "High risk of addiction; overdose can cause cardiac arrest; seizures; or stroke. Chronic use leads to heart damage; nasal tissue damage (if snorted); and mental health issues like paranoia. Mixing with other substances (e.g.; heroin; alcohol) increases overdose risk.; Addiction; psychosis; cardiovascular complications; nasal damage (if snorted).; and mental health issues like paranoia. high abuse potential; limited medical use as a topical anesthetic. Mixing with other substances (e.g.",
+          "legal_status": "Schedule II (high abuse potential; limited medical use as a topical anesthetic). Illegal for recreational use since 1914.; Schedule II (USA); Schedule II (). Illegal for recreational use since 1914.",
+          "aliases": [
+            "Adidas",
+            "Apache",
+            "Aunt Nora",
+            "Belushi (with heroin)",
+            "Bernice",
+            "Bump",
+            "Death Valley",
+            "Diesel",
+            "Diamonds",
+            "Florida Snow",
+            "Ice Cream",
+            "Jump Rope",
+            "Mona Lisa",
+            "Stardust",
+            "Superman",
+            "Tequila",
+            "Toot",
+            "Zapato",
+            "White Girl",
+            "White Goat",
+            "White Horse",
+            "White Shirt",
+            "Cocaine hydrochloride",
+            "Methyl benzoylecgonine"
+          ],
+          "emojis": "❄️🌨️⛄💎🎱🔑😛🐡🥥❄🌨🍚🤧"
+        }
+      }
+    ],
+    "label_assignment": {
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [
+      {
+        "triple_id": "property_projection:6894760102717377797:cocaine:mentioned_in",
+        "object_text": "Cocaine",
+        "attribute": "mentioned_in",
+        "value_text": "social_media_post",
+        "source_modality": "drug_term_grounding",
+        "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+        "confidence": 0.62,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6894760102717377797:cocaine:has_pharmacology",
+        "object_text": "Cocaine",
+        "attribute": "has_pharmacology",
+        "value_text": "Stimulant derived from coca plant leaves; cocaine hydrochloride is the primary active compound. Increases dopamine levels in the brain by blocking reuptake. Administered by snorting; injecting; or smoking (as crack cocaine).; Stimulant blocking dopamine reuptake; increasing dopamine levels.",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+        "confidence": 0.62,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6894760102717377797:cocaine:has_effects",
+        "object_text": "Cocaine",
+        "attribute": "has_effects",
+        "value_text": "Euphoria; increased energy; alertness; elevated heart rate; and blood pressure. Can cause anxiety; paranoia; and agitation. Crack cocaine provides intense but short-lived effects.; Increased energy; euphoria; anxiety; cardiovascular issues.",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+        "confidence": 0.62,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6894760102717377797:cocaine:has_toxicity_and_harm_potential",
+        "object_text": "Cocaine",
+        "attribute": "has_toxicity_and_harm_potential",
+        "value_text": "High risk of addiction; overdose can cause cardiac arrest; seizures; or stroke. Chronic use leads to heart damage; nasal tissue damage (if snorted); and mental health issues like paranoia. Mixing with other substances (e.g.; heroin; alcohol) increases overdose risk.; Addiction; psychosis; cardiovascular complications; nasal damage (if snorted).; and mental health issues like paranoia. high abuse potential; limited medical use as a topical anesthetic. Mixing with other substances (e.g.",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+        "confidence": 0.62,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      },
+      {
+        "triple_id": "property_projection:6894760102717377797:cocaine:has_legal_status",
+        "object_text": "Cocaine",
+        "attribute": "has_legal_status",
+        "value_text": "Schedule II (high abuse potential; limited medical use as a topical anesthetic). Illegal for recreational use since 1914.; Schedule II (USA); Schedule II (). Illegal for recreational use since 1914.",
+        "source_modality": "chemical_term_table_property",
+        "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+        "confidence": 0.62,
+        "needs_human_validation": true,
+        "generation_method": "property_to_oav_projection",
+        "validation_status": "provisional_candidate"
+      }
+    ],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "query_term": "blow",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "ocr": "When you snorted all the blow the sun came up, and the plug stopped answering",
+      "final_ocr": "When you snorted all the blow the sun came up, and the plug stopped answering",
+      "final_text_for_pipeline": "When you snorted all the blow the sun came up, and the plug stopped answering"
+    },
+    "validation": {
+      "queue_items": [
+        {
+          "target_type": "drug_property_assignment",
+          "status": "pending",
+          "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+          "reason": "ambiguous_alias_or_provisional_property_grounding"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6894760102717377797:cocaine:mentioned_in",
+          "status": "pending",
+          "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6894760102717377797:cocaine:has_pharmacology",
+          "status": "pending",
+          "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6894760102717377797:cocaine:has_effects",
+          "status": "pending",
+          "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6894760102717377797:cocaine:has_toxicity_and_harm_potential",
+          "status": "pending",
+          "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+          "reason": "property_derived_oav_candidate_requires_review"
+        },
+        {
+          "target_type": "oav_triple",
+          "target_id": "property_projection:6894760102717377797:cocaine:has_legal_status",
+          "status": "pending",
+          "context_snippet": "when you snorted all the blow the sun came up and the plug stopped answering",
+          "reason": "property_derived_oav_candidate_requires_review"
+        }
+      ],
+      "summary": {
+        "needs_human_validation": true,
+        "pending_queue_count": 6,
+        "property_assignments_needing_review": 1,
+        "oav_triples_needing_review": 5,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.778,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": true,
+        "oav_triples": true,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  },
+  {
+    "schema_version": "2.0",
+    "record_kind": "sponsor_friendly_per_video_story",
+    "video": {
+      "video_id": "6898478920857947398",
+      "platform": "tiktok",
+      "url": "https://www.tiktokv.com/share/video/6898478920857947398/",
+      "availability_status": "available_public",
+      "availability_reason": "oembed_success"
+    },
+    "summary_columns": {
+      "video_id": "6898478920857947398",
+      "url": "https://www.tiktokv.com/share/video/6898478920857947398/",
+      "detected_drug": null,
+      "matched_surface_term": null,
+      "drug_confidence": null,
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "auto_label_confidence": null,
+      "llm_label": null,
+      "llm_label_text": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "model_label": null,
+      "rule_label": null,
+      "active_learning_priority": null,
+      "oav_triple_count": 0,
+      "ontology_mapping_count": 0,
+      "behavior_cv_summary": "",
+      "education_top_action": null,
+      "education_category": null,
+      "education_score": null,
+      "validation_status": "no_current_flag",
+      "pending_review_count": 0,
+      "completeness_score": 0.556
+    },
+    "sponsor_explanation": {
+      "plain_language_finding": "The system assigns misuse-related evidence, but no chemical-table drug entity is grounded yet.",
+      "why_it_matters": "This makes the video explainable: the dashboard can show the text cue, the mapped drug property, the label, and why a reviewer should or should not trust it.",
+      "review_message": "No immediate review flag is present, but it can still be sampled for quality control.",
+      "education_message": "No prevention-education recommendation has been attached yet."
+    },
+    "pipeline_stages": [
+      {
+        "stage_id": "query_source",
+        "title": "Query source",
+        "status": "complete",
+        "headline": "existing_year2_dataset",
+        "details": [
+          "Origin: existing_year2_dataset",
+          "Action rank: not ranked",
+          "API field: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "evidence_extraction",
+        "title": "Evidence extracted",
+        "status": "complete",
+        "headline": "Transcript / OCR / metadata available",
+        "details": [
+          "I hope no one heard that. I hope no one heard that. Because if they're going to be in some trouble. when af and start coughing_"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "drug_properties",
+        "title": "Drug properties",
+        "status": "not_available_yet",
+        "headline": "No chemical-table match",
+        "details": [
+          "No canonical drug-property record is attached yet."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "label_assignment",
+        "title": "Label + LLM check",
+        "status": "complete",
+        "headline": "Auto label 2: Misuse-related evidence",
+        "details": [
+          "Model label: not available",
+          "Rule label: not available",
+          "LLM label: preview/live LLM not run yet",
+          "Active-learning priority: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "oav_ontology",
+        "title": "OAV + ontology",
+        "status": "not_available_yet",
+        "headline": "0 OAV triples, 0 ontology mappings",
+        "details": [
+          "No OAV triple attached yet.",
+          "Top ontology term: not available"
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "behavior_cv",
+        "title": "Behavior / CV cue",
+        "status": "not_available_yet",
+        "headline": "No behavior/CV cue attached yet",
+        "details": [
+          "Behavior and visual cues are treated as review candidates until a human checks the timestamp/frame."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "education",
+        "title": "Education action",
+        "status": "not_available_yet",
+        "headline": "No education action attached yet",
+        "details": [
+          "Education resources are generated for candidate rows with label/behavior signals and can be added to existing videos after the next run."
+        ],
+        "confidence": null
+      },
+      {
+        "stage_id": "validation_feedback",
+        "title": "Validation + KG update",
+        "status": "complete",
+        "headline": "Ready for sampling / no current flag",
+        "details": [
+          "Pending queue count: 0",
+          "Completeness score: 0.556",
+          "Human decisions update query bank, ontology/KG, label distribution, and PRD rewards."
+        ],
+        "confidence": null
+      }
+    ],
+    "drug_properties": [],
+    "label_assignment": {
+      "auto_label": 2,
+      "auto_label_text": "Misuse-related evidence",
+      "confidence": null,
+      "model_label": null,
+      "model_confidence": null,
+      "rule_label": null,
+      "rule_confidence": null,
+      "llm_label": null,
+      "llm_confidence": null,
+      "llm_status": "not_run_for_this_video",
+      "disagreement_flag": null,
+      "uncertainty_entropy": null,
+      "prob_margin": null,
+      "active_learning_priority": null,
+      "human_validation_reason": null
+    },
+    "oav_triples": [],
+    "ontology_mappings": [],
+    "behavior_and_cv": {
+      "behavior_annotations": [],
+      "computer_vision_cues": [],
+      "summary": ""
+    },
+    "education_session": {
+      "recommendations": [],
+      "top_action": null,
+      "display_rule": "Show only approved prevention/support resources. High-risk or uncertain cases remain behind human review."
+    },
+    "retrieval_provenance": {
+      "origin": "existing_year2_dataset",
+      "note": "This video predates the Year 3 official-API retrieval planner; future crawled videos will carry action-level provenance."
+    },
+    "text_evidence": {
+      "whisper_asr": "I hope no one heard that. I hope no one heard that. Because if they're going to be in some trouble.",
+      "ocr": "when af and start coughing_",
+      "final_transcript": "I hope no one heard that. I hope no one heard that. Because if they're going to be in some trouble.",
+      "final_ocr": "when af and start coughing_",
+      "final_text_for_pipeline": "I hope no one heard that. I hope no one heard that. Because if they're going to be in some trouble. when af and start coughing_"
+    },
+    "validation": {
+      "queue_items": [],
+      "summary": {
+        "needs_human_validation": false,
+        "pending_queue_count": 0,
+        "property_assignments_needing_review": 0,
+        "oav_triples_needing_review": 0,
+        "ontology_mappings_needing_review": 0,
+        "label_needs_review": false
+      }
+    },
+    "completeness": {
+      "score": 0.556,
+      "status": "partial",
+      "layers": {
+        "base_metadata": true,
+        "text_evidence": true,
+        "relevance_label": true,
+        "drug_properties": false,
+        "oav_triples": false,
+        "ontology_mappings": false,
+        "behavior_annotations": false,
+        "retrieval_provenance": true,
+        "validation": true
+      }
+    }
+  }
+]

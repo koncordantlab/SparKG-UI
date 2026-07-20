@@ -1,0 +1,128 @@
+{
+  "total_videos": 1659,
+  "coverage": {
+    "video_id": 1659,
+    "url": 439,
+    "detected_drug": 299,
+    "matched_surface_term": 299,
+    "drug_confidence": 299,
+    "auto_label": 1659,
+    "auto_label_text": 1659,
+    "llm_status": 1659,
+    "oav_triple_count": 1659,
+    "ontology_mapping_count": 1659,
+    "validation_status": 1659,
+    "pending_review_count": 1659,
+    "completeness_score": 1659,
+    "behavior_cv_summary": 9,
+    "auto_label_confidence": 56,
+    "model_label": 56,
+    "rule_label": 56,
+    "active_learning_priority": 56,
+    "education_top_action": 56,
+    "education_category": 56,
+    "education_score": 56
+  },
+  "columns": [
+    {
+      "name": "video_id",
+      "non_empty_count": 1659
+    },
+    {
+      "name": "url",
+      "non_empty_count": 439
+    },
+    {
+      "name": "detected_drug",
+      "non_empty_count": 299
+    },
+    {
+      "name": "matched_surface_term",
+      "non_empty_count": 299
+    },
+    {
+      "name": "drug_confidence",
+      "non_empty_count": 299
+    },
+    {
+      "name": "auto_label",
+      "non_empty_count": 1659
+    },
+    {
+      "name": "auto_label_text",
+      "non_empty_count": 1659
+    },
+    {
+      "name": "auto_label_confidence",
+      "non_empty_count": 56
+    },
+    {
+      "name": "llm_label",
+      "non_empty_count": 0
+    },
+    {
+      "name": "llm_label_text",
+      "non_empty_count": 0
+    },
+    {
+      "name": "llm_confidence",
+      "non_empty_count": 0
+    },
+    {
+      "name": "llm_status",
+      "non_empty_count": 1659
+    },
+    {
+      "name": "model_label",
+      "non_empty_count": 56
+    },
+    {
+      "name": "rule_label",
+      "non_empty_count": 56
+    },
+    {
+      "name": "active_learning_priority",
+      "non_empty_count": 56
+    },
+    {
+      "name": "oav_triple_count",
+      "non_empty_count": 1659
+    },
+    {
+      "name": "ontology_mapping_count",
+      "non_empty_count": 1659
+    },
+    {
+      "name": "behavior_cv_summary",
+      "non_empty_count": 9
+    },
+    {
+      "name": "education_top_action",
+      "non_empty_count": 56
+    },
+    {
+      "name": "education_category",
+      "non_empty_count": 56
+    },
+    {
+      "name": "education_score",
+      "non_empty_count": 56
+    },
+    {
+      "name": "validation_status",
+      "non_empty_count": 1659
+    },
+    {
+      "name": "pending_review_count",
+      "non_empty_count": 1659
+    },
+    {
+      "name": "completeness_score",
+      "non_empty_count": 1659
+    }
+  ],
+  "notes": {
+    "llm_label": "The package supports live/cached LLM labels. Existing offline data includes preview-mode placeholders for some candidates; the live LLM label column is populated when the optional LLM labeling run is executed.",
+    "education": "Education recommendations are available for the 56 Year 3 candidate/dry-run videos and can be generated for historical videos after automatic labeling is run on them."
+  }
+}
