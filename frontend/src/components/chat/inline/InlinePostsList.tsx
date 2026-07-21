@@ -22,7 +22,7 @@ export default function InlinePostsList({ data, title, exportContext }: Props) {
     <div className="mt-3">
       <div className="flex items-center justify-between mb-2">
         {title && <p className="text-xs font-semibold text-gray-500 uppercase">{title}</p>}
-        <ExportButton data={data} filename={title?.replace(/\s+/g, '_').toLowerCase() || 'posts_data'} exportContext={exportContext} />
+        <ExportButton data={data} filename={title?.replace(/\s+/g, '_').toLowerCase() || 'posts_data'} exportContext={exportContext} title={title} />
       </div>
       <div className="space-y-2 max-h-80 overflow-y-auto">
         {data.map((post) => (

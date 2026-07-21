@@ -11,6 +11,7 @@ interface Props {
   data: unknown
   filename: string
   exportContext?: ExportContext
+  title?: string
 }
 
 const API_BASE = '/api/v1'
@@ -20,7 +21,7 @@ const PLATFORMS = [
   { label: 'YouTube', value: 'youtube' },
 ]
 
-export default function ExportButton({ data, filename, exportContext }: Props) {
+export default function ExportButton({ data, filename, exportContext, title }: Props) {
   const [showPicker, setShowPicker] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -57,8 +58,43 @@ export default function ExportButton({ data, filename, exportContext }: Props) {
     }
   }
 
+  const handlePdfExport = () => {
+    const rows = Array.isArray(data) ? data : [data]
+    const heading = title || filename
+    const date = new Date().toLocaleDateString()
+
+    const tableRows = rows.map((row) => {
+      const entries = Object.entries(row as Record<string, unknown>)
+      return `<tr>${entries.map(([k, v]) => `<td>${k}</td><td>${v ?? ''}</td>`).join('')}</tr>`
+    }).join('')
+
+    const html = `
+      <html><head><title>${heading}</title>
+      <style>
+        body { font-family: sans-serif; padding: 24px; color: #111; }
+        h1 { font-size: 18px; margin-bottom: 4px; }
+        p.meta { font-size: 11px; color: #666; margin-bottom: 16px; }
+        table { border-collapse: collapse; width: 100%; font-size: 12px; }
+        td { border: 1px solid #ddd; padding: 6px 10px; vertical-align: top; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        td:first-child { font-weight: 600; color: #555; width: 30%; }
+      </style></head>
+      <body>
+        <h1>${heading}</h1>
+        <p class="meta">Exported on ${date} · SPAR-KG Dashboard</p>
+        <table>${tableRows}</table>
+      </body></html>`
+
+    const win = window.open('', '_blank')
+    if (!win) return
+    win.document.write(html)
+    win.document.close()
+    win.focus()
+    win.print()
+  }
+
   return (
-    <div className="relative">
+    <div className="relative flex items-center gap-2">
       <button
         onClick={handleClick}
         disabled={loading}
@@ -69,6 +105,17 @@ export default function ExportButton({ data, filename, exportContext }: Props) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
         {loading ? 'Exporting...' : 'Export JSON'}
+      </button>
+
+      <button
+        onClick={handlePdfExport}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+        title="Export data as PDF"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+        Export PDF
       </button>
 
       {showPicker && (

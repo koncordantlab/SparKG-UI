@@ -19,7 +19,7 @@ export default function InlineBarChart({ data, title, exportContext }: Props) {
     <div className="mt-3">
       <div className="flex items-center justify-between mb-2">
         {title && <p className="text-xs font-semibold text-gray-500 uppercase">{title}</p>}
-        <ExportButton data={data} filename={title?.replace(/\s+/g, '_').toLowerCase() || 'chart_data'} exportContext={exportContext} />
+        <ExportButton data={data} filename={title?.replace(/\s+/g, '_').toLowerCase() || 'chart_data'} exportContext={exportContext} title={title} />
       </div>
       <div className="bg-gray-50 rounded-lg p-3 border">
         <ResponsiveContainer width="100%" height={Math.min(data.length * 36, 360)}>
