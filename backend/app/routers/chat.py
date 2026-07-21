@@ -180,6 +180,38 @@ async def _build_data_context(context: Dict[str, Any]) -> str:
             )
             parts.append(f"Top drugs on TikTok: {tiktok_list}")
 
+        # Top Reddit drugs specifically
+        reddit_drugs_query = """
+        SELECT scientific_name, SUM(post_count) as posts, SUM(total_score) as engagement
+        FROM sparkg_gold.weekly_drug_counts
+        WHERE scientific_name IS NOT NULL
+        GROUP BY scientific_name
+        ORDER BY posts DESC
+        LIMIT 10
+        """
+        reddit_drugs = bq_service.execute_query(reddit_drugs_query, max_results=10)
+        if reddit_drugs:
+            reddit_list = ", ".join(
+                f"{d['scientific_name']} ({d['posts']} posts, {d['engagement']} engagement)" for d in reddit_drugs
+            )
+            parts.append(f"Top drugs on Reddit: {reddit_list}")
+
+        # Top YouTube drugs specifically
+        youtube_drugs_query = """
+        SELECT scientific_name, SUM(total_videos) as videos, SUM(total_views) as views
+        FROM sparkg_gold.youtube_weekly_engagement
+        WHERE scientific_name IS NOT NULL
+        GROUP BY scientific_name
+        ORDER BY videos DESC
+        LIMIT 10
+        """
+        youtube_drugs = bq_service.execute_query(youtube_drugs_query, max_results=10)
+        if youtube_drugs:
+            youtube_list = ", ".join(
+                f"{d['scientific_name']} ({d['videos']} videos, {d['views']} views)" for d in youtube_drugs
+            )
+            parts.append(f"Top drugs on YouTube: {youtube_list}")
+
         # Extract drug name from question if not in context
         drug = context.get("drug")
         if not drug:

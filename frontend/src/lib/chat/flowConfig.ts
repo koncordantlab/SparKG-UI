@@ -53,14 +53,12 @@ export const flowNodes: Record<string, FlowNode> = {
       { label: 'Drug Lookup', value: 'drug-lookup' },
       { label: 'Platform Overview', value: 'platform-overview' },
       { label: 'Behavioral Analysis', value: 'behavior' },
-      { label: 'Ask a Question', value: 'free-text' },
     ],
     next: {
       'drug-trends': 'drug-trends.pick-platform',
       'drug-lookup': 'drug-lookup.search',
       'platform-overview': 'platform-overview.pick-platform',
       'behavior': 'behavior.pick-dimension',
-      'free-text': 'free-text.input',
     },
   },
 
@@ -474,13 +472,11 @@ export const flowNodes: Record<string, FlowNode> = {
       })
     },
     options: [
-      { label: 'Ask Another Question', value: 'ask-another' },
       { label: 'Drug Trends', value: 'drug-trends' },
       { label: 'Drug Lookup', value: 'drug-lookup' },
       { label: 'Start Over', value: 'start-over', variant: 'secondary' },
     ],
     next: {
-      'ask-another': 'free-text.input',
       'drug-trends': 'drug-trends.pick-platform',
       'drug-lookup': 'drug-lookup.search',
       'start-over': 'root.start',
@@ -505,11 +501,9 @@ export const flowNodes: Record<string, FlowNode> = {
       )
     },
     options: [
-      { label: 'Ask a Follow-up', value: 'follow-up' },
       { label: 'Start Over', value: 'start-over', variant: 'secondary' },
     ],
     next: {
-      'follow-up': 'free-text.input',
       'start-over': 'root.start',
     },
   },

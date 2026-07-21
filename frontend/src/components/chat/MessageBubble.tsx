@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import type { ChatMessage, StatCard, BarChartItem, LineChartPoint, PostItem } from '@/lib/chat/types'
 import QuickReplyButtons from './QuickReplyButtons'
 import InlineStatsCards from './inline/InlineStatsCards'
@@ -33,9 +35,13 @@ function TypewriterText({ text, isLatest }: { text: string; isLatest: boolean })
   }, [text, isLatest])
 
   return (
-    <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-800">
-      {displayed}
-    </p>
+    <div className="text-sm leading-relaxed text-gray-800 prose prose-sm max-w-none
+      prose-table:border-collapse prose-table:w-full
+      prose-th:border prose-th:border-gray-300 prose-th:bg-gray-100 prose-th:px-3 prose-th:py-1 prose-th:text-left prose-th:text-xs prose-th:font-semibold
+      prose-td:border prose-td:border-gray-200 prose-td:px-3 prose-td:py-1 prose-td:text-xs
+      prose-strong:font-semibold prose-p:my-1 prose-ul:my-1 prose-li:my-0">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayed}</ReactMarkdown>
+    </div>
   )
 }
 

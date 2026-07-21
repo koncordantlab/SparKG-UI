@@ -60,6 +60,20 @@ export async function processNodeEntry(state: ChatState): Promise<ChatState> {
     }
   }
 
+  // Inject "Ask a Question" on every node that has options,
+  // except the root menu and the free-text input itself
+  if (
+    options &&
+    node.id !== 'free-text.input' &&
+    node.id !== 'root.start' &&
+    !options.some(o => o.value === 'ask-question')
+  ) {
+    options = [
+      ...options,
+      { label: 'Ask a Question', value: 'ask-question', variant: 'secondary' },
+    ]
+  }
+
   // Build inline content
   let inlineContent: ChatMessage['inlineContent'] = undefined
   if (node.renderResult && apiResult) {
@@ -124,6 +138,21 @@ export async function processUserAction(
     return processNodeEntry(state)
   }
 
+  // Handle persistent "Ask a Question" button
+  if (action.value === 'ask-question') {
+    const userMessage: ChatMessage = {
+      id: crypto.randomUUID(),
+      sender: 'user',
+      text: 'Ask a Question',
+      timestamp: new Date(),
+    }
+    return processNodeEntry({
+      ...state,
+      messages: [...state.messages, userMessage],
+      currentNodeId: 'free-text.input',
+    })
+  }
+
   // Add user message — use the button label if available, otherwise the raw value
   const userLabel = action.label || action.value
   const userMessage: ChatMessage = {
@@ -146,18 +175,23 @@ export async function processUserAction(
   if (!node) {
     nextNodeId = 'root.start'
   } else if (action.type === 'submit_text') {
-    // Always try intent detection first for any free-text submission
-    const intent = detectVideoIntent(action.value, newState.context) as (Partial<FlowContext> & { _drugStatsOnly?: boolean }) | null
-    if (intent) {
-      const { _drugStatsOnly, ...ctxUpdate } = intent
-      newState = { ...newState, context: { ...newState.context, ...ctxUpdate } }
-      nextNodeId = _drugStatsOnly ? 'drug-lookup.show-drug-stats' : 'drug-lookup.show-posts'
+    const platformTrend = detectPlatformTrendIntent(action.value)
+    const drugStats = !platformTrend ? detectDrugStatsIntent(action.value) : null
+    const postIntent = !platformTrend && !drugStats ? detectPostIntent(action.value, newState.context) : null
+    if (platformTrend) {
+      newState = { ...newState, context: { ...newState.context, selectedPlatform: platformTrend } }
+      nextNodeId = 'drug-trends.pick-time'
+    } else if (drugStats) {
+      newState = { ...newState, context: { ...newState.context, selectedDrug: drugStats.selectedDrug, ...(drugStats.selectedPlatform ? { selectedPlatform: drugStats.selectedPlatform } : {}) } }
+      nextNodeId = 'drug-lookup.show-drug-stats'
+    } else if (postIntent) {
+      newState = { ...newState, context: { ...newState.context, ...postIntent } }
+      nextNodeId = 'drug-lookup.show-posts'
     } else if (typeof node.next === 'function') {
       nextNodeId = node.next(action.value, newState.context)
     } else if (node.next[action.value]) {
       nextNodeId = node.next[action.value]
     } else {
-      // No match — go to LLM
       nextNodeId = 'free-text.llm-response'
     }
   } else if (typeof node.next === 'function') {
@@ -235,71 +269,84 @@ function updateContext(state: ChatState, value: string, node: FlowNode | undefin
   return { ...state, context: ctx }
 }
 
-const VIDEO_INTENT_KEYWORDS = [
-  'video', 'videos', 'post', 'posts', 'show', 'get', 'find', 'list', 'fetch',
-  'see', 'display', 'browse', 'content', 'clips', 'results',
-]
 
-const PLATFORM_KEYWORDS: Record<string, FlowContext['selectedPlatform']> = {
-  tiktok: 'tiktok',
-  'tik tok': 'tiktok',
-  reddit: 'reddit',
-  youtube: 'youtube',
-  'you tube': 'youtube',
-  yt: 'youtube',
+const TREND_KEYWORDS = ['trend', 'trends', 'trending', 'top drugs', 'popular']
+const STATS_KEYWORDS = ['stat', 'stats', 'statistics', 'numbers', 'count', 'summary', 'overview', 'breakdown']
+const PLATFORM_NAMES: Record<string, FlowContext['selectedPlatform']> = {
+  reddit: 'reddit', tiktok: 'tiktok', 'tik tok': 'tiktok',
+  youtube: 'youtube', 'you tube': 'youtube', yt: 'youtube',
 }
-
-const STOP_WORDS = new Set([
-  'get', 'me', 'the', 'show', 'find', 'list', 'fetch', 'see', 'display', 'browse',
-  'give', 'containing', 'about', 'with', 'for', 'on', 'in', 'videos', 'video',
-  'posts', 'post', 'clips', 'clip', 'content', 'results', 'related', 'to',
-  'tiktok', 'reddit', 'youtube', 'all', 'platforms', 'a', 'an', 'use', 'using',
-  'drug', 'drugs', 'data', 'info', 'information', 'trend', 'trends', 'what', 'how',
-  'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+const DRUG_STOP_WORDS = new Set([
+  'get', 'me', 'the', 'show', 'find', 'stat', 'stats', 'statistics',
+  'for', 'on', 'in', 'about', 'with', 'of', 'a', 'an', 'give',
+  'tiktok', 'reddit', 'youtube', 'summary', 'overview', 'breakdown',
+  'numbers', 'count', 'trend', 'trends', 'trending',
 ])
 
-function detectVideoIntent(
-  query: string,
-  ctx: FlowContext
-): Partial<FlowContext> | null {
+function detectPlatformTrendIntent(query: string): FlowContext['selectedPlatform'] | null {
   const q = query.toLowerCase().trim()
+  // Only match "trends in X" style — not when a stats keyword is also present (that's drug stats)
+  const hasTrend = TREND_KEYWORDS.some(kw => q.includes(kw))
+  const hasStats = STATS_KEYWORDS.some(kw => q.includes(kw))
+  if (!hasTrend || hasStats) return null
+  for (const [kw, p] of Object.entries(PLATFORM_NAMES)) {
+    if (q.includes(kw)) return p
+  }
+  return null
+}
 
-  // Detect platform from query or fall back to existing context
-  let platform: FlowContext['selectedPlatform'] = ctx.selectedPlatform || 'tiktok'
-  for (const [kw, p] of Object.entries(PLATFORM_KEYWORDS)) {
-    if (q.includes(kw)) {
-      platform = p
-      break
-    }
+function detectDrugStatsIntent(query: string): { selectedDrug: string; selectedPlatform?: FlowContext['selectedPlatform'] } | null {
+  const q = query.toLowerCase().trim()
+  const hasStats = STATS_KEYWORDS.some(kw => q.includes(kw))
+  if (!hasStats) return null
+
+  let platform: FlowContext['selectedPlatform'] | undefined
+  for (const [kw, p] of Object.entries(PLATFORM_NAMES)) {
+    if (q.includes(kw)) { platform = p; break }
   }
 
-  // Extract candidate drug words (strip stop words and short tokens)
-  const words = q
-    .replace(/[^\w\s]/g, '')
-    .split(/\s+/)
-    .filter(w => w.length >= 3 && !STOP_WORDS.has(w))
-
+  const words = q.replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length >= 3 && !DRUG_STOP_WORDS.has(w))
   if (words.length === 0) return null
 
-  // Use the longest remaining word as the drug name
   const drugName = words.sort((a, b) => b.length - a.length)[0]
-  if (drugName.length < 3) return null
-
   const selectedDrug = drugName.charAt(0).toUpperCase() + drugName.slice(1)
-  const hasVideoIntent = VIDEO_INTENT_KEYWORDS.some(kw => q.includes(kw))
 
-  // If explicit video/show intent — go straight to posts list
-  if (hasVideoIntent) {
-    return { selectedPlatform: platform, selectedDrug }
+  return { selectedDrug, selectedPlatform: platform }
+}
+
+const POST_FETCH_KEYWORDS = ['get', 'show', 'find', 'fetch', 'list', 'see', 'display', 'browse']
+const POST_TARGET_KEYWORDS = ['post', 'posts', 'video', 'videos', 'content', 'clips']
+const PLATFORM_MAP: Record<string, FlowContext['selectedPlatform']> = {
+  tiktok: 'tiktok', 'tik tok': 'tiktok',
+  reddit: 'reddit',
+  youtube: 'youtube', 'you tube': 'youtube', yt: 'youtube',
+}
+const STOP_WORDS = new Set([
+  'get', 'me', 'the', 'show', 'find', 'list', 'fetch', 'see', 'display', 'browse',
+  'give', 'about', 'with', 'for', 'on', 'in', 'video', 'videos', 'post', 'posts',
+  'clips', 'content', 'related', 'to', 'tiktok', 'reddit', 'youtube', 'a', 'an',
+  'some', 'all', 'from', 'of',
+])
+
+function detectPostIntent(query: string, ctx: FlowContext): Partial<FlowContext> | null {
+  const q = query.toLowerCase().trim()
+
+  const hasFetchWord = POST_FETCH_KEYWORDS.some(kw => q.includes(kw))
+  const hasPostWord = POST_TARGET_KEYWORDS.some(kw => q.includes(kw))
+  if (!hasFetchWord || !hasPostWord) return null
+
+  let platform: FlowContext['selectedPlatform'] = ctx.selectedPlatform || 'tiktok'
+  for (const [kw, p] of Object.entries(PLATFORM_MAP)) {
+    if (q.includes(kw)) { platform = p; break }
   }
 
-  // Bare drug name (1-2 meaningful words, no question words) — go to drug stats
-  const hasQuestionWords = /^(what|how|why|when|where|who|tell|explain|describe|is |are |does )/.test(q)
-  if (!hasQuestionWords && words.length <= 3) {
-    return { selectedPlatform: platform, selectedDrug, _drugStatsOnly: true } as Partial<FlowContext> & { _drugStatsOnly?: boolean }
-  }
+  const words = q.replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length >= 3 && !STOP_WORDS.has(w))
+  if (words.length === 0) return null
 
-  return null
+  const drugName = words.sort((a, b) => b.length - a.length)[0]
+  const selectedDrug = drugName.charAt(0).toUpperCase() + drugName.slice(1)
+
+  return { selectedPlatform: platform, selectedDrug }
 }
 
 function addBotMessage(
