@@ -7,7 +7,7 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    router.replace('/tiktok') // original /reddit
+    router.replace('/tiktok')
   }, [router])
 
   return (

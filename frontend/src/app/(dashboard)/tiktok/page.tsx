@@ -1,7 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
+import {
+  LineChart, Line, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts'
 
 const CATEGORY_COLORS: Record<string, string> = {
   opioid: 'bg-gray-100 text-gray-700',
@@ -15,6 +19,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   antihistamine: 'bg-gray-100 text-gray-700',
   unknown: 'bg-gray-100 text-gray-700',
 }
+
+const COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#6366f1', '#14b8a6']
 
 interface TikTokStats {
   total_videos: number
@@ -60,6 +66,36 @@ interface CategoryBreakdown {
   total_likes: number
 }
 
+interface DailyData {
+  date: string
+  scientific_name: string
+  mentions: number
+  total_views: number
+}
+
+//
+
+interface TopDrug {
+  scientific_name: string
+  mentions: number
+}
+
+const monthOptions = [
+  { value: '', label: 'All Months' },
+  { value: '01', label: 'January' },
+  { value: '02', label: 'February' },
+  { value: '03', label: 'March' },
+  { value: '04', label: 'April' },
+  { value: '05', label: 'May' },
+  { value: '06', label: 'June' },
+  { value: '07', label: 'July' },
+  { value: '08', label: 'August' },
+  { value: '09', label: 'September' },
+  { value: '10', label: 'October' },
+  { value: '11', label: 'November' },
+  { value: '12', label: 'December' },
+]
+
 export default function TikTokDashboard() {
   const [stats, setStats] = useState<TikTokStats | null>(null)
   const [drugsBreakdown, setDrugsBreakdown] = useState<DrugBreakdown[]>([])
@@ -67,38 +103,169 @@ export default function TikTokDashboard() {
   const [categoryBreakdown, setCategoryBreakdown] = useState<CategoryBreakdown[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadData()
-  }, [])
+
+  const [dailyData, setDailyData] = useState<DailyData[]>([])
+    // Date filters
+  const [selectedYear, setSelectedYear] = useState<string>('')
+  const [selectedMonth, setSelectedMonth] = useState<string>('')
+  const [topDrugs, setTopDrugs] = useState<TopDrug[]>([])
+  const [filteredData, setFilteredData] = useState<DailyData[]>([])
+  const [selectedDrugs, setSelectedDrugs] = useState<string[]>([])
+
+  //note: might need to grab the usememos and the filtered data from reddit, not sure yet.
+
+  const availableYears = useMemo(() => {
+      const years = new Set<string>()
+      dailyData.forEach(d => {
+        const year = d.date.split('-')[0]
+        if (year) years.add(year)
+      })
+      return Array.from(years).sort().reverse()
+    }, [dailyData])
+  
+    // Extract available months for selected year
+    const availableMonths = useMemo(() => {
+      if (!selectedYear) return []
+      const months = new Set<string>()
+      dailyData
+        .filter(d => d.date.startsWith(selectedYear))
+        .forEach(d => {
+          const month = d.date.split('-')[1]
+          if (month) months.add(month)
+        })
+      return Array.from(months).sort()
+    }, [dailyData, selectedYear])
+  
+    useEffect(() => {
+      loadData()
+    }, [])
+  
+    useEffect(() => {
+      filterData()
+    }, [dailyData, selectedYear, selectedMonth])
 
   const loadData = async () => {
     try {
       setLoading(true)
 
-      const [statsRes, drugsRes, videosRes, catRes] = await Promise.all([
+      const [statsRes, drugsRes, videosRes, catRes, dailyRes] = await Promise.all([
         fetch('/api/v1/dashboard/tiktok/stats'),
         fetch('/api/v1/dashboard/tiktok/drugs-breakdown'),
         fetch('/api/v1/dashboard/tiktok/recent-videos?limit=8'),
-        fetch('/api/v1/dashboard/tiktok/category-breakdown')
+        fetch('/api/v1/dashboard/tiktok/category-breakdown'),
+        fetch('/api/v1/dashboard/trends/daily?platform=tiktok&days=730')
       ])
 
-      const [statsData, drugsData, videosData, catData] = await Promise.all([
+      const [statsData, drugsData, videosData, catData, dailyData] = await Promise.all([
         statsRes.json(),
         drugsRes.json(),
         videosRes.json(),
-        catRes.json()
+        catRes.json(),
+        dailyRes.json()
       ])
 
       setStats(statsData)
       setDrugsBreakdown(Array.isArray(drugsData) ? drugsData : [])
       setRecentVideos(Array.isArray(videosData) ? videosData : [])
       setCategoryBreakdown(Array.isArray(catData) ? catData : [])
+      setDailyData(Array.isArray(dailyData) ? dailyData : [])
     } catch (err) {
       console.error('Failed to load TikTok data:', err)
     } finally {
       setLoading(false)
     }
   }
+
+  //everytihing below is for the line graphs
+
+  const filterData = () => {
+    let data = [...dailyData]
+
+    // Filter by year (date format: "2026-01-02")
+    if (selectedYear) {
+      data = data.filter(d => d.date.startsWith(selectedYear))
+    }
+
+    // Filter by month
+    if (selectedMonth) {
+      data = data.filter(d => {
+        const [year, month] = d.date.split('-')
+        return year === selectedYear && month === selectedMonth
+      })
+    }
+
+    setFilteredData(data)
+
+    // Recalculate stats and top drugs based on filtered data
+    const drugMentions = data.reduce((acc: Record<string, number>, item: DailyData) => {
+      acc[item.scientific_name] = (acc[item.scientific_name] || 0) + item.mentions
+      return acc
+    }, {})
+
+    const topDrugNames = Object.entries(drugMentions)
+      .sort(([,a], [,b]) => (b as number) - (a as number))
+      .slice(0, 5)
+      .map(([name]) => name)
+
+    if (selectedDrugs.length === 0 || !selectedDrugs.some(d => topDrugNames.includes(d))) {
+      setSelectedDrugs(topDrugNames)
+    }
+
+    const topDrugsCalc = Object.entries(drugMentions)
+      .map(([name, mentions]) => ({
+        scientific_name: name,
+        mentions: mentions as number,
+        total_score: data
+          .filter((d: DailyData) => d.scientific_name === name)
+          .reduce((sum: number, d: DailyData) => sum + (d.total_views || 0), 0)
+      }))
+      .sort((a, b) => b.mentions - a.mentions)
+      .slice(0, 10)
+    setTopDrugs(topDrugsCalc)
+  }
+
+      // Transform daily data for line chart
+    const getLineChartData = () => {
+    const dateMap: Record<string, Record<string, number | string>> = {}
+    //this feels really iffy
+    filteredData
+      .filter(d => selectedDrugs.includes(d.scientific_name))
+      .forEach(d => {
+        if (!dateMap[d.date]) {
+          dateMap[d.date] = {
+            date: d.date,
+            displayDate: formatDateLabel(d.date)
+          } as Record<string, number | string>
+        }
+        dateMap[d.date][d.scientific_name] = d.mentions
+      })
+
+    return Object.values(dateMap).sort((a, b) =>
+      (a.date as string).localeCompare(b.date as string)
+    )
+  }
+  
+
+  const clearFilters = () => {
+    setSelectedYear('')
+    setSelectedMonth('')
+  } 
+
+  const toggleDrug = (drug: string) => {
+    setSelectedDrugs(prev =>
+      prev.includes(drug)
+        ? prev.filter(d => d !== drug)
+        : [...prev, drug]
+    )
+  }
+
+  const formatDateLabel = (dateStr: string): string => {
+    const [year, month, day] = dateStr.split('-').map(Number)
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    return `${months[month - 1]} ${day}`
+  }
+
+  //note: everything above is added to ensure the line graph works
 
   const formatNumber = (num: number) => {
     if (!num) return '0'
@@ -131,6 +298,65 @@ export default function TikTokDashboard() {
         <h1 className="text-2xl font-bold text-gray-900">TikTok Dashboard</h1>
         <p className="text-gray-500">Drug mention analytics from classified TikTok videos</p>
       </div>
+
+      {/* Date Filters */} 
+      <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border">
+        <div className="flex flex-wrap items-end gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+            <select
+              value={selectedYear}
+              onChange={(e) => {
+                setSelectedYear(e.target.value)
+                setSelectedMonth('') // Reset month when year changes
+              }}
+              className="border rounded-lg px-3 py-2 min-w-[120px]"
+            >
+              <option value="">All Years</option>
+              {availableYears.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="border rounded-lg px-3 py-2 min-w-[140px]"
+              disabled={!selectedYear}
+            >
+              <option value="">All Months</option>
+              {selectedYear && availableMonths.map(month => {
+                const monthOption = monthOptions.find(m => m.value === month)
+                return (
+                  <option key={month} value={month}>
+                    {monthOption?.label || month}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
+
+          <button
+            onClick={clearFilters}
+            className="px-4 py-2 text-gray-600 border rounded-lg hover:bg-gray-50"
+          >
+            Clear Filters
+          </button>
+
+          <div className="ml-auto text-sm text-gray-500">
+            {availableYears.length > 0 ? (
+              <>Data available: {availableYears[availableYears.length - 1]} - {availableYears[0]}</>
+            ) : (
+              'No data available'
+            )}
+            {' • '}
+            Showing {filteredData.length} data points
+          </div>
+        </div>
+      </div> 
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -335,6 +561,65 @@ export default function TikTokDashboard() {
           {recentVideos.length === 0 && (
             <p className="text-gray-500 text-center py-4 col-span-4">No recent videos available</p>
           )}
+        </div>
+      </div>
+
+          {/* Daily Trends Line Chart */} 
+      <div className="bg-white rounded-xl shadow-sm p-6 border">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Daily Trends</h3>
+          <div className="flex flex-wrap gap-2">
+            {drugsBreakdown.slice(0, 8).map((drug, idx) => (
+              <button
+                key={drug.scientific_name}
+                onClick={() => toggleDrug(drug.scientific_name)}
+                className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                  selectedDrugs.includes(drug.scientific_name)
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-600'
+                }`}
+                style={{
+                  backgroundColor: selectedDrugs.includes(drug.scientific_name)
+                    ? COLORS[idx % COLORS.length]
+                    : undefined
+                }}
+              >
+                {drug.scientific_name}
+              </button> 
+            ))}
+          </div>
+        </div>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={getLineChartData()}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="displayDate"
+                tick={{ fontSize: 11 }}
+                interval={Math.max(0, Math.floor(getLineChartData().length / 12) - 1)}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis
+                domain={['dataMin', 'dataMax']}
+                allowDataOverflow={false}
+                tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}K` : value}
+              />
+              <Tooltip />
+              {/*<Legend />*/}
+              {selectedDrugs.slice(0, 8).map((drug) => (
+                <Line
+                  key={drug}
+                  type="monotone"
+                  dataKey={drug}
+                  stroke={COLORS[topDrugs.findIndex(d => d.scientific_name === drug) % COLORS.length]}                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  connectNulls
+                />
+              ))} 
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
