@@ -477,7 +477,7 @@ export default function TikTokDashboard() {
         {/* Category Breakdown */}
         <div className="bg-white rounded-xl shadow-sm p-6 border">
           <h3 className="text-lg font-semibold mb-4">Videos by Category</h3>
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-80 overflow-y-auto"> {/* Added the max height and overflow y auto, think that's the scroll wheel */}
             {categoryBreakdown.map((cat) => {
               const maxCatVideos = Math.max(...categoryBreakdown.map(c => c.video_count), 1)
               return (
@@ -511,60 +511,7 @@ export default function TikTokDashboard() {
         </div>
       </div>
 
-      {/* Recent Videos */}
-      <div className="bg-white rounded-xl shadow-sm p-6 border">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Recent Classified Videos</h3>
-          <Link
-            href="/tiktok/videos"
-            className="text-sm text-gray-600 hover:text-gray-800"
-          >
-            View all videos →
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {recentVideos.map((video) => (
-            <a
-              key={video.video_id}
-              href={video.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-            >
-              {/* Video Placeholder */}
-              <div className="bg-gray-800 h-32 flex items-center justify-center relative">
-                <svg className="w-10 h-10 text-white opacity-60" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-                {video.substance_use_confidence && (
-                  <span className={`absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded ${getConfidenceColor(video.substance_use_confidence)}`}>
-                    {Math.round(video.substance_use_confidence * 100)}%
-                  </span>
-                )}
-              </div>
-              <div className="p-3">
-                <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                  {video.description || 'No description'}
-                </p>
-                <div className="flex items-center justify-end">
-                  <span className={`text-xs px-1.5 py-0.5 rounded ${CATEGORY_COLORS[drugsBreakdown.find(d => d.scientific_name === video.scientific_name)?.category || 'unknown'] || CATEGORY_COLORS.unknown}`}>
-                    {video.scientific_name}
-                  </span>
-                </div>
-                <div className="flex gap-2 mt-2 text-xs text-gray-400">
-                  <span>{formatNumber(video.view_count)} views</span>
-                  <span>{formatNumber(video.like_count)} likes</span>
-                </div>
-              </div>
-            </a>
-          ))}
-          {recentVideos.length === 0 && (
-            <p className="text-gray-500 text-center py-4 col-span-4">No recent videos available</p>
-          )}
-        </div>
-      </div>
-
-          {/* Daily Trends Line Chart */} 
+{/* Daily Trends Line Chart */} 
       <div className="bg-white rounded-xl shadow-sm p-6 border">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Daily Trends</h3>
@@ -622,6 +569,61 @@ export default function TikTokDashboard() {
           </ResponsiveContainer>
         </div>
       </div>
+
+      {/* Recent Videos */}
+      <div className="bg-white rounded-xl shadow-sm p-6 border">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Recent Classified Videos</h3>
+          <Link
+            href="/tiktok/videos"
+            className="text-sm text-gray-600 hover:text-gray-800"
+          >
+            View all videos →
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {recentVideos.map((video) => (
+            <a
+              key={video.video_id}
+              href={video.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+            >
+              {/* Video Placeholder */}
+              <div className="bg-gray-800 h-32 flex items-center justify-center relative">
+                <svg className="w-10 h-10 text-white opacity-60" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                {video.substance_use_confidence && (
+                  <span className={`absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded ${getConfidenceColor(video.substance_use_confidence)}`}>
+                    {Math.round(video.substance_use_confidence * 100)}%
+                  </span>
+                )}
+              </div>
+              <div className="p-3">
+                <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+                  {video.description || 'No description'}
+                </p>
+                <div className="flex items-center justify-end">
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${CATEGORY_COLORS[drugsBreakdown.find(d => d.scientific_name === video.scientific_name)?.category || 'unknown'] || CATEGORY_COLORS.unknown}`}>
+                    {video.scientific_name}
+                  </span>
+                </div>
+                <div className="flex gap-2 mt-2 text-xs text-gray-400">
+                  <span>{formatNumber(video.view_count)} views</span>
+                  <span>{formatNumber(video.like_count)} likes</span>
+                </div>
+              </div>
+            </a>
+          ))}
+          {recentVideos.length === 0 && (
+            <p className="text-gray-500 text-center py-4 col-span-4">No recent videos available</p>
+          )}
+        </div>
+      </div>
+
+          
     </div>
   )
 }

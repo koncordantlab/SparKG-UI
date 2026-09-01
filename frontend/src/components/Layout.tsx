@@ -78,14 +78,6 @@ const ChatIcon = () => (
 
 const navSections: NavSection[] = [
   {
-    title: 'REDDIT ANALYSIS',
-    items: [
-      { label: 'Reddit Dashboard', href: '/reddit', icon: <DashboardIcon /> },
-      { label: 'Posts', href: '/reddit/posts', icon: <PostsIcon /> },
-      { label: 'Drug List', href: '/reddit/drugs', icon: <DrugListIcon /> },
-    ],
-  },
-  {
     title: 'TIKTOK ANALYSIS',
     items: [
       { label: 'TikTok Dashboard', href: '/tiktok', icon: <DashboardIcon /> },
@@ -93,6 +85,14 @@ const navSections: NavSection[] = [
       { label: 'Drug List', href: '/tiktok/drugs', icon: <DrugListIcon /> },
       { label: 'Behavior', href: '/tiktok/behavior', icon: <BehaviorIcon /> },
       { label: 'Review', href: '/tiktok/sponsor-review', icon: <PostsIcon /> },
+    ],
+  },
+  {
+    title: 'REDDIT ANALYSIS',
+    items: [
+      { label: 'Reddit Dashboard', href: '/reddit', icon: <DashboardIcon /> },
+      { label: 'Posts', href: '/reddit/posts', icon: <PostsIcon /> },
+      { label: 'Drug List', href: '/reddit/drugs', icon: <DrugListIcon /> },
     ],
   },
   {
