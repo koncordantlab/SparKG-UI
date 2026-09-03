@@ -216,64 +216,6 @@ export default function ExportDataPage() {
 
       const res = await fetch(`/api/v1/dashboard/export/data/${platform}?${params}`)
       const data = await res.json()
-      
-
-      // Download as JSON file
-    /*const rows = Array.isArray(data) ? data : [data]
-    const heading = `${platform}_export_${new Date().toISOString().split('T')[0]}.pdf` //title || 
-    const date = new Date().toLocaleDateString()
-
-    const tableRows = rows.map((row) => {
-      const entries = Object.entries(row as Record<string, unknown>)
-      return `<tr>${entries.map(([k, v]) => `<td>${k}</td><td>${v ?? ''}</td>`).join('')}</tr>`
-    }).join('')*/
-
-    /*const heading = `${platform}_export_${new Date().toISOString().split('T')[0]}.pdf` //title || 
-    const date = new Date().toLocaleDateString()
-    
-    const rows = Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : [];
-    const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
-    const formatValue = (value: unknown) => {
-      if (value === null || value === undefined) return ''
-      if (typeof value === 'object') return JSON.stringify(value)
-      return String(value)
-    }
-    const tableHeader = `<tr>${columns
-      .map((column) => `<th>${column}</th>`)
-      .join("")}</tr>`;
-    const tableRows = rows.map((row: Record<string, unknown>) => {
-    return `<tr>${columns
-      .map((column) =>`<td>${formatValue(row[column])}</td>`)
-      .join("")}</tr>`;}).join("");
-
-    const html = `
-      <html><head><title>${heading}</title>
-      <style>
-        body { font-family: sans-serif; padding: 24px; color: #111; }
-        h1 { font-size: 18px; margin-bottom: 4px; }
-        p.meta { font-size: 11px; color: #666; margin-bottom: 16px; }
-        table { border-collapse: collapse; width: 100%; font-size: 12px; table-layout: fixed }
-        thead {disaply: table-header-group; }
-        td { border: 1px solid #ddd; padding: 6px 10px; vertical-align: top; white-space: 
-          normal; overflow-wrap: anywhere; word-wrap: break-word; }
-        tr:nth-child(even) { background: #f9f9f9; }
-        td:first-child { font-weight: 600; color: #555; width: 30%; }
-      </style></head>
-      <body>
-        <h1>${heading}</h1>
-        <p class="meta">Exported on ${date} · SPAR-KG Dashboard</p>
-        <table>
-          <thead>${tableHeader}</thead>
-          <tbody>${tableRows}</tbody>
-        </table>
-      </body></html>`
-
-    const win = window.open('', '_blank')
-    if (!win) return
-    win.document.write(html)
-    win.document.close()
-    win.focus()
-    win.print()*/
     
     const rows = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : []
 
