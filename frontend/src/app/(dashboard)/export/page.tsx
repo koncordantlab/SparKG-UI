@@ -144,7 +144,7 @@ export default function ExportDataPage() {
     }
   }
 
-  const handleExport = async () => {
+  const handleExportJSON = async () => {
     setExporting(true)
 
     try {
@@ -188,6 +188,72 @@ export default function ExportDataPage() {
       setExporting(false)
     }
   }
+
+ const handleExportCSV = async () => {
+    setExporting(true)
+
+    try {
+      // Build date filters
+      let startDate: string | undefined
+      let endDate: string | undefined
+
+      if (selectedYear) {
+        if (selectedMonth) {
+          startDate = `${selectedYear}-${selectedMonth}-01`
+          // Get last day of month
+          const lastDay = new Date(parseInt(selectedYear), parseInt(selectedMonth), 0).getDate()
+          endDate = `${selectedYear}-${selectedMonth}-${lastDay.toString().padStart(2, '0')}`
+        } else {
+          startDate = `${selectedYear}-01-01`
+          endDate = `${selectedYear}-12-31`
+        }
+      }
+
+      const params = new URLSearchParams()
+      if (startDate) params.append('start_date', startDate)
+      if (endDate) params.append('end_date', endDate)
+      if (selectedDrug) params.append('drug', selectedDrug)
+
+      const res = await fetch(`/api/v1/dashboard/export/data/${platform}?${params}`)
+      const data = await res.json()
+    
+    const rows = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : []
+
+    if (rows.length === 0) {
+      return "";
+    }
+    const headers = Object.keys(rows[0]);
+    const escapeCSVValue = (value: unknown): string => {
+      if (value === null || value === undefined) return '';
+    
+    let stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+    stringValue = stringValue.replace(/"/g, '""');
+      if (stringValue.includes('"') || stringValue.includes(',') || stringValue.includes('\n') 
+        || stringValue.includes('\r')) {
+        stringValue = `"${stringValue}"`;
+      }
+      return stringValue;
+    }
+    const headerRow = headers.map(escapeCSVValue).join(',');
+    const dataRows = rows.map((row: Record<string, unknown>) => headers.map((header) => escapeCSVValue(row[header])).join(','));
+    const csvContent = [headerRow, ...dataRows].join('\n');
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${platform}_export_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  
+  } catch (err) {
+      console.error('Export failed:', err)
+    } finally {
+      setExporting(false)
+    }
+  } 
 
   const clearFilters = () => {
     setSelectedYear('')
@@ -378,7 +444,7 @@ export default function ExportDataPage() {
 
         <div className="flex items-center gap-4">
           <button
-            onClick={handleExport}
+            onClick={handleExportJSON}
             disabled={exporting || loading}
             className="px-6 py-3 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-800 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
           >
@@ -402,7 +468,33 @@ export default function ExportDataPage() {
           <span className="text-sm text-gray-500">
             Maximum 10,000 records per export
           </span>
+          <button
+            onClick={handleExportCSV}
+            disabled={exporting || loading}
+            className="px-6 py-3 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-800 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {exporting ? (
+              <>
+                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Exporting...
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export CSV
+              </>
+            )}
+          </button>
+          <span className="text-sm text-gray-500">
+            Maximum 10,000 records per export
+          </span>
         </div>
+        
       </div>
     </div>
   )

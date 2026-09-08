@@ -211,6 +211,374 @@ export default function RedditDashboard() {
     setSelectedMonth('')
   }
 
+  //This code is for trying to space the labels out in the graph
+
+const getLabelRadiusOffsets = (
+  data: { name: string; value: number }[],
+  minAngleGap = 28,
+  staggerDistance = 22
+) => {
+  const total = data.reduce(
+    (sum, item) => sum + item.value,
+    0
+  );
+
+  // Angular width of every slice
+  const sliceAngles = data.map(
+    (item) => (item.value / total) * 360
+  );
+
+  const offsets = new Array(data.length).fill(0);
+
+  let staggerLevel = 0;
+
+  for (let i = 1; i < data.length; i++) {
+    // Distance between the centers of two neighboring slices
+    const centerGap =
+      (sliceAngles[i - 1] + sliceAngles[i]) / 2;
+
+    if (centerGap < minAngleGap) {
+      // Alternate between normal and farther-out positions
+      staggerLevel = staggerLevel === 0 ? 1 : 0;
+
+      offsets[i] =
+        staggerLevel * staggerDistance;
+    } else {
+      staggerLevel = 0;
+    }
+  }
+
+  return offsets;
+};
+
+const resolveLabelCollisions = (
+  data: { name: string; value: number }[],
+  initialOffsets: number[],
+  cx: number,
+  cy: number,
+  outerRadius: number,
+  startAngle = 90,
+  endAngle = -270
+) => {
+  const offsets = [...initialOffsets];
+
+  const RADIAN = Math.PI / 180;
+
+  const BASE_LABEL_DISTANCE = 25;
+  const FONT_SIZE = 14;
+
+  // How much empty space we want around each label
+  const HORIZONTAL_BUFFER = 4;
+  const VERTICAL_BUFFER = 5;
+
+  // How far to push ONLY a colliding label
+  const COLLISION_PUSH = 8;
+
+  const total = data.reduce(
+    (sum, item) => sum + item.value,
+    0
+  );
+
+  const sweep = endAngle - startAngle;
+
+  // Calculate the middle angle of each pie slice
+  let currentAngle = startAngle;
+
+  const angles = data.map((item) => {
+    const sliceAngle =
+      (item.value / total) * sweep;
+
+    const midAngle =
+      currentAngle + sliceAngle / 2;
+
+    currentAngle += sliceAngle;
+
+    return midAngle;
+  });
+
+  const getLabelBox = (index: number) => {
+    const item = data[index];
+    const midAngle = angles[index];
+
+    const cos = Math.cos(-midAngle * RADIAN);
+    const sin = Math.sin(-midAngle * RADIAN);
+
+    const radius =
+      outerRadius +
+      BASE_LABEL_DISTANCE +
+      offsets[index];
+
+    const x = cx + radius * cos;
+    const y = cy + radius * sin;
+
+    const percent =
+      Math.round(
+        (item.value / total) * 100
+      );
+
+    const text =
+      `${item.name} (${percent}%)`;
+
+    /*
+     * Approximate text width.
+     * 0.56 works reasonably well for a
+     * 14px sans-serif font.
+     */
+    const width =
+      text.length * FONT_SIZE * 0.56;
+
+    const isRight = cos >= 0;
+
+    const left = isRight
+      ? x
+      : x - width;
+
+    const right = isRight
+      ? x + width
+      : x;
+
+    return {
+      index,
+      x,
+      y,
+      cos,
+      sin,
+      isRight,
+
+      left:
+        left - HORIZONTAL_BUFFER,
+
+      right:
+        right + HORIZONTAL_BUFFER,
+
+      top:
+        y -
+        FONT_SIZE / 2 -
+        VERTICAL_BUFFER,
+
+      bottom:
+        y +
+        FONT_SIZE / 2 +
+        VERTICAL_BUFFER,
+    };
+  };
+
+  const overlaps = (
+    a: ReturnType<typeof getLabelBox>,
+    b: ReturnType<typeof getLabelBox>
+  ) => {
+    // Labels on opposite sides of the pie
+    // don't need collision handling.
+    if (a.isRight !== b.isRight) {
+      return false;
+    }
+
+    return (
+      a.left < b.right &&
+      a.right > b.left &&
+      a.top < b.bottom &&
+      a.bottom > b.top
+    );
+  };
+
+  /*
+   * Resolve collisions iteratively.
+   *
+   * Only one of the two colliding labels
+   * receives an additional radius offset.
+   */
+  for (let pass = 0; pass < 20; pass++) {
+    let foundCollision = false;
+
+    for (let i = 0; i < data.length; i++) {
+      for (
+        let j = i + 1;
+        j < data.length;
+        j++
+      ) {
+        const a = getLabelBox(i);
+        const b = getLabelBox(j);
+
+        if (!overlaps(a, b)) {
+          continue;
+        }
+
+        foundCollision = true;
+
+        /*
+         * Test which label benefits more from
+         * being pushed outward.
+         */
+        const distanceIfAMoves =
+          Math.hypot(
+            a.x +
+              COLLISION_PUSH * a.cos -
+              b.x,
+            a.y +
+              COLLISION_PUSH * a.sin -
+              b.y
+          );
+
+        const distanceIfBMoves =
+          Math.hypot(
+            b.x +
+              COLLISION_PUSH * b.cos -
+              a.x,
+            b.y +
+              COLLISION_PUSH * b.sin -
+              a.y
+          );
+
+        if (
+          distanceIfAMoves >
+          distanceIfBMoves
+        ) {
+          offsets[i] += COLLISION_PUSH;
+        } else {
+          offsets[j] += COLLISION_PUSH;
+        }
+
+        /*
+         * Recalculate positions after each change,
+         * rather than moving unrelated labels.
+         */
+        break;
+      }
+
+      if (foundCollision) {
+        break;
+      }
+    }
+
+    if (!foundCollision) {
+      break;
+    }
+  }
+
+  return offsets;
+};
+
+const width = 600;
+const height = 400;
+const cx = width / 2;
+const cy = height * 0.40; /// 2;
+const outerRadius = 90;
+
+const renderCustomizedLabel = ({
+  index,
+  cx,
+  cy,
+  midAngle,
+  outerRadius,
+  name,
+  percent,
+}: any) => {
+  const RADIAN = Math.PI / 180;
+  const labelColor = COLORS[index % COLORS.length];
+
+  const cos =
+    Math.cos(-midAngle * RADIAN);
+
+  const sin =
+    Math.sin(-midAngle * RADIAN);
+
+  // Normal distance from pie
+  const baseRadius = outerRadius + 25;
+
+  // Add extra distance only when this label
+  // belongs to a crowded group
+  const extraOffset =
+    labelRadiusOffsets[index] ?? 0;
+
+  const labelRadius =
+    baseRadius + extraOffset;
+
+  // IMPORTANT:
+  // x and y come directly from Recharts' midAngle.
+  // Therefore the text stays aligned with its slice.
+  const x =
+    cx + labelRadius * cos;
+
+  const y =
+    cy + labelRadius * sin;
+
+  // Start the connector directly on this slice
+  //Note: All of this commented out code, as well as the labelLine={false} in the Pie component, removes the 
+  //label lines. I don't know if we'll want them in the future, so I decided to keep them in here for now - Aidan
+  /*const lineStartRadius =
+    outerRadius + 3;
+
+  const x1 =
+    cx + lineStartRadius * cos;
+
+  const y1 =
+    cy + lineStartRadius * sin;
+
+  // End the line immediately before the text
+  const lineEndRadius =
+    labelRadius - 7;
+
+  const x2 =
+    cx + lineEndRadius * cos;
+
+  const y2 =
+    cy + lineEndRadius * sin;*/
+
+  return (
+    <g>
+      {/*<line
+        x1={x1}
+        y1={y1}
+        x2={x2}
+        y2={y2}
+        stroke={labelColor}
+        strokeWidth={1}
+      />*/}
+
+      <text
+        x={x}
+        y={y}
+        textAnchor={
+          cos >= 0 ? "start" : "end"
+        }
+        dominantBaseline="central"
+        fontSize={14}
+        fill={labelColor}
+      >
+        {`${name} (${(
+          percent * 100
+        ).toFixed(0)}%)`}
+      </text>
+    </g>
+  );
+};
+
+const initialLabelOffsets =
+  getLabelRadiusOffsets(
+    subreddits.map((item) => ({
+      name: item.subreddit,
+      value: item.total_posts,
+    })),
+    28,
+    22
+  );
+
+const labelRadiusOffsets =
+  resolveLabelCollisions(
+    subreddits.map((item) => ({
+      name: item.subreddit,
+      value: item.total_posts,
+    })),
+    initialLabelOffsets,
+    cx,
+    cy,
+    outerRadius,
+    90,
+    -270
+  );
+
+//end label spacing code
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -354,17 +722,18 @@ export default function RedditDashboard() {
           <h3 className="text-lg font-semibold mb-4">Top Subreddits</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
+              <PieChart> 
                 <Pie
                   data={subreddits}
                   dataKey="total_posts"
                   nameKey="subreddit"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label={({ subreddit, percent }) => `r/${subreddit} (${(percent * 100).toFixed(0)}%)`}
-                  labelLine={false}
-                >
+                  cx={cx}
+                  cy={cy}
+                  outerRadius={outerRadius}
+                  startAngle={90}
+                  endAngle={-270}
+                  label={renderCustomizedLabel} 
+                  labelLine={false} >
                   {subreddits.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
