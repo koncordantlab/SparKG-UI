@@ -15,7 +15,8 @@
     "react-dom": "^18.2.0",
     "react-markdown": "^10.1.0",
     "recharts": "^2.10.4",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "uvicorn": "^0.0.1-security"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",

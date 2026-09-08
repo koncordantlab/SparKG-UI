@@ -185,8 +185,17 @@ export async function processUserAction(
       newState = { ...newState, context: { ...newState.context, selectedDrug: drugStats.selectedDrug, ...(drugStats.selectedPlatform ? { selectedPlatform: drugStats.selectedPlatform } : {}) } }
       nextNodeId = 'drug-lookup.show-drug-stats'
     } else if (postIntent) {
-      newState = { ...newState, context: { ...newState.context, ...postIntent } }
-      nextNodeId = 'drug-lookup.show-posts'
+      if (Array.isArray(postIntent)) {
+        let current = newState
+        for (const intent of postIntent) {
+          current = { ...current, context: { ...current.context, ...intent }, currentNodeId: 'drug-lookup.show-posts' }
+          current = await processNodeEntry(current)
+        }
+        return current
+      } else {
+        newState = { ...newState, context: { ...newState.context, ...postIntent } }
+        nextNodeId = 'drug-lookup.show-posts'
+      }
     } else if (typeof node.next === 'function') {
       nextNodeId = node.next(action.value, newState.context)
     } else if (node.next[action.value]) {
@@ -328,14 +337,13 @@ const STOP_WORDS = new Set([
   'some', 'all', 'from', 'of',
 ])
 
-function detectPostIntent(query: string, ctx: FlowContext): Partial<FlowContext> | null {
+function detectPostIntent(query: string, ctx: FlowContext): Partial<FlowContext> | Partial<FlowContext>[] | null {
   const q = query.toLowerCase().trim()
 
-  const hasFetchWord = POST_FETCH_KEYWORDS.some(kw => q.includes(kw))
   const hasPostWord = POST_TARGET_KEYWORDS.some(kw => q.includes(kw))
-  if (!hasFetchWord || !hasPostWord) return null
+  if (!hasPostWord) return null
 
-  let platform: FlowContext['selectedPlatform'] = ctx.selectedPlatform || 'tiktok'
+  let platform: FlowContext['selectedPlatform'] = undefined
   for (const [kw, p] of Object.entries(PLATFORM_MAP)) {
     if (q.includes(kw)) { platform = p; break }
   }
@@ -345,6 +353,14 @@ function detectPostIntent(query: string, ctx: FlowContext): Partial<FlowContext>
 
   const drugName = words.sort((a, b) => b.length - a.length)[0]
   const selectedDrug = drugName.charAt(0).toUpperCase() + drugName.slice(1)
+
+  if (!platform) {
+    return [
+      { selectedPlatform: 'tiktok', selectedDrug },
+      { selectedPlatform: 'reddit', selectedDrug },
+      { selectedPlatform: 'youtube', selectedDrug }
+    ]
+  }
 
   return { selectedPlatform: platform, selectedDrug }
 }
