@@ -11,7 +11,13 @@ interface Props {
 }
 
 export default function InlineLineChart({ data, title, exportContext }: Props) {
-  if (!data || data.length === 0) return null
+  if (!data || data.length === 0) {
+    return (
+      <div className="mt-3 bg-gray-50 rounded-lg p-4 border text-center text-sm text-gray-500">
+        There is no data present for this time frame, would you like to check a different time?
+      </div>
+    )
+  }
 
   // Detect numeric keys besides 'date'
   const numericKeys = Object.keys(data[0] || {}).filter(

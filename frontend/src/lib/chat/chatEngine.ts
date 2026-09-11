@@ -260,6 +260,7 @@ function updateContext(state: ChatState, value: string, node: FlowNode | undefin
   if (
     !value.startsWith('drug:') &&
     !value.startsWith('category:') &&
+    !value.startsWith('behavior-value:') &&
     !['start-over', 'back'].includes(value) &&
     (node?.showTextInput || !Object.keys(node?.next || {}).includes(value))
   ) {
