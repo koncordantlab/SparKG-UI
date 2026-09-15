@@ -238,7 +238,7 @@ function updateContext(state: ChatState, value: string, node: FlowNode | undefin
 
   // Category selection
   if (value.startsWith('category:')) {
-    ctx.selectedCategory = value.replace('category:', '')
+    ctx.selectedCategory = value.replace('category:', '').toLowerCase()
   }
 
   // Behavior dimension
@@ -261,7 +261,7 @@ function updateContext(state: ChatState, value: string, node: FlowNode | undefin
     !value.startsWith('drug:') &&
     !value.startsWith('category:') &&
     !value.startsWith('behavior-value:') &&
-    !['start-over', 'back'].includes(value) &&
+    !['start-over', 'back', 'reddit-posts', 'tiktok-posts', 'youtube-posts', 'trend', 'top-drugs', 'categories'].includes(value) &&
     (node?.showTextInput || !Object.keys(node?.next || {}).includes(value))
   ) {
     ctx.freeTextQuery = value
