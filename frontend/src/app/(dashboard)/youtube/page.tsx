@@ -173,26 +173,229 @@ export default function YouTubeDashboard() {
     return `${months[month - 1]} ${day}`
   }
 
-  // Transform daily data for line chart
-  const getLineChartData = () => {
-    const dateMap: Record<string, Record<string, number | string>> = {}
+  const median = (values: number[]): number => {
+    const sorted = [...values].sort((a, b) => a - b)
 
-    filteredData
-      .filter(d => selectedDrugs.includes(d.scientific_name))
-      .forEach(d => {
-        if (!dateMap[d.date]) {
-          dateMap[d.date] = {
-            date: d.date,
-            displayDate: formatDateLabel(d.date)
-          } as Record<string, number | string>
-        }
-        dateMap[d.date][d.scientific_name] = d.mentions
-      })
+    const middle = Math.floor(sorted.length / 2)
 
-    return Object.values(dateMap).sort((a, b) =>
-      (a.date as string).localeCompare(b.date as string)
-    )
+    if (sorted.length % 2 === 0) {
+      return (sorted[middle - 1] + sorted[middle]) / 2
+    }
+
+    return sorted[middle]
   }
+
+const getNiceTickStep = (rawStep: number): number => {
+  if (rawStep <= 0) return 1
+
+  const magnitude = Math.pow(
+    10,
+    Math.floor(Math.log10(rawStep))
+  )
+
+  const normalized = rawStep / magnitude
+
+  let niceNormalized: number
+
+  if (normalized <= 1) {
+    niceNormalized = 1
+  } else if (normalized <= 2) {
+    niceNormalized = 2
+  } else if (normalized <= 2.5) {
+    niceNormalized = 2.5
+  } else if (normalized <= 5) {
+    niceNormalized = 5
+  } else if (normalized <= 7.5) {
+      niceNormalized = 7.5
+  } else {
+    niceNormalized = 10
+  }
+
+  return niceNormalized * magnitude
+}
+
+const getYAxisScale = (
+  maxValue: number,
+  sections = 4
+) => {
+  const rawStep = maxValue / sections
+
+  const step = getNiceTickStep(rawStep)
+
+  const axisMax = step * sections
+
+  const ticks = Array.from(
+    { length: sections + 1 },
+    (_, index) => index * step
+  )
+
+  return {
+    step,
+    axisMax,
+    ticks
+  }
+}
+
+
+const removeOutliers = <T extends {
+  date: string
+  scientific_name: string
+  mentions: number
+}>(
+  data: T[],
+  windowRadius = 2,
+  deviationThreshold = 0.5
+): T[] => {
+
+  // Group datapoints by drug
+  const grouped = new Map<string, T[]>()
+
+  data.forEach(item => {
+    if (!grouped.has(item.scientific_name)) {
+      grouped.set(item.scientific_name, [])
+    }
+
+    grouped.get(item.scientific_name)!.push(item)
+  })
+
+  const cleaned: T[] = []
+
+  grouped.forEach(items => {
+
+    // Sort each drug's datapoints by date
+    const sorted = [...items].sort(
+      (a, b) =>
+        new Date(a.date).getTime() -
+        new Date(b.date).getTime()
+    )
+
+    sorted.forEach((current, index) => {
+
+      const neighborValues: number[] = []
+
+      // Look at points within the rolling window
+      for (
+        let i = index - windowRadius;
+        i <= index + windowRadius;
+        i++
+      ) {
+
+        // Skip the current point
+        if (i === index) {
+          continue
+        }
+
+        // Skip indexes outside the array
+        if (i < 0 || i >= sorted.length) {
+          continue
+        }
+
+        neighborValues.push(sorted[i].mentions)
+      }
+
+      /*
+       * Require enough neighboring points to make
+       * the median meaningful.
+       */
+      if (neighborValues.length < 2) {
+        cleaned.push(current)
+        return
+      }
+
+      const localMedian = median(neighborValues)
+
+      /*
+       * How far BELOW the local median is this point?
+       *
+       * Example:
+       *
+       * median = 100
+       * current = 20
+       *
+       * deviation = (100 - 20) / 100
+       *           = 0.80
+       *           = 80%
+       */
+      const denominator = Math.max(
+        Math.abs(localMedian),
+        1
+      )
+
+      const downwardDeviation =
+        (localMedian - current.mentions) /
+        denominator
+
+      /*
+       * Only remove DOWNWARD outliers.
+       *
+       * This prevents legitimate high values from
+       * being removed.
+       */
+      const isOutlier =
+        current.mentions < localMedian &&
+        downwardDeviation >= deviationThreshold
+
+      if (!isOutlier) {
+        cleaned.push(current)
+      }
+    })
+  })
+
+  return cleaned
+}
+
+const getLineChartData = () => {
+  const dateMap: Record<
+    string,
+    Record<string, number | string>
+  > = {}
+
+  // First select only the drugs being displayed
+  const selectedData = filteredData.filter(d =>
+    selectedDrugs.includes(d.scientific_name)
+  )
+
+  // Remove local rolling-median outliers
+  const cleanedData = removeOutliers(
+    selectedData,
+    2,     // look 2 points before + 2 points after
+    0.5    // remove points >= 50% below local median
+  )
+
+  cleanedData.forEach(d => {
+
+    if (!dateMap[d.date]) {
+      dateMap[d.date] = {
+        date: d.date,
+        displayDate: formatDateLabel(d.date)
+      } as Record<string, number | string>
+    }
+
+    dateMap[d.date][d.scientific_name] = d.mentions
+  })
+
+  return Object.values(dateMap).sort((a, b) =>
+    (a.date as string).localeCompare(
+      b.date as string
+    )
+  )
+}
+
+const maxValue = Math.max(
+  ...getLineChartData().flatMap(row =>
+    selectedDrugs.map(drug => {
+      const value = row[drug]
+
+      return typeof value === "number"
+        ? value
+        : 0
+    })
+  )
+)
+
+const { axisMax, ticks } = getYAxisScale(maxValue, 4)    
+
+    
 
   const formatNumber = (num: number) => {
     if (!num) return '0'
@@ -415,17 +618,28 @@ export default function YouTubeDashboard() {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={getLineChartData()}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
+              <CartesianGrid strokeDasharray="3 3" syncWithTicks={true} />
+              {/*<XAxis
                 dataKey="displayDate"
                 tick={{ fontSize: 11 }}
                 interval="preserveStartEnd"
                 minTickGap={30}
-              />
+              />*/}
+              <XAxis
+                dataKey="displayDate"
+                tick={{ fontSize: 11 }}
+                interval={Math.max(0, Math.floor(getLineChartData().length / 12) - 1)}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              /> 
               <YAxis
-                domain={['dataMin', 'dataMax']}
+                domain={[0, axisMax]}
                 allowDataOverflow={false}
                 tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}K` : value}
+                ticks={ticks}
+                allowDecimals={false}
+                padding={{ top:10 }}
               />
               <Tooltip />
               <Legend />
