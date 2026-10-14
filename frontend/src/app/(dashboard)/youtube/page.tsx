@@ -58,6 +58,9 @@ export default function YouTubeDashboard() {
   const [selectedYear, setSelectedYear] = useState<string>('')
   const [selectedMonth, setSelectedMonth] = useState<string>('')
 
+  const [selectedYear2, setSelectedYear2] = useState<string>(selectedYear)
+  const [selectedMonth2, setSelectedMonth2] = useState<string>(selectedMonth)
+
   // Extract available years from data (date format: "2025-01-15")
   const availableYears = useMemo(() => {
     const years = new Set<string>()
@@ -81,6 +84,18 @@ export default function YouTubeDashboard() {
     return Array.from(months).sort()
   }, [weeklyData, selectedYear])
 
+  const availableMonths2 = useMemo(() => {
+    if (!selectedYear2) return []
+    const months = new Set<string>()
+    weeklyData
+      .filter(d => d.date?.startsWith(selectedYear2))
+      .forEach(d => {
+        const month = d.date?.split('-')[1]
+        if (month) months.add(month)
+      })
+    return Array.from(months).sort()
+  }, [weeklyData, selectedYear2])
+
   useEffect(() => {
     loadData()
   }, [])
@@ -88,6 +103,10 @@ export default function YouTubeDashboard() {
   useEffect(() => {
     filterData()
   }, [weeklyData, selectedYear, selectedMonth])
+
+  useEffect(() => {
+    filterData2()
+  }, [weeklyData, selectedYear2, selectedMonth2])
 
   const loadData = async () => {
     try {
@@ -164,6 +183,25 @@ export default function YouTubeDashboard() {
     setStats(totalStats)
   }
 
+const filterData2 = () => {
+    let data = [...weeklyData]
+
+    // Filter by year (date format: "2025-01-15")
+    if (selectedYear2) {
+      data = data.filter(d => d.date?.startsWith(selectedYear2.toString()))
+    }
+
+    // Filter by month
+    if (selectedMonth2) {
+      data = data.filter(d => {
+        const month = d.date?.split('-')[1]
+        return month === selectedMonth2
+      })
+    }
+
+    setFilteredData(data)
+  }
+
   // Format date string (e.g., "2025-01-15") to display format
   // Parse manually to avoid timezone issues with Date constructor
   const formatDateLabel = (dateStr: string): string => {
@@ -199,6 +237,8 @@ const getNiceTickStep = (rawStep: number): number => {
 
   if (normalized <= 1) {
     niceNormalized = 1
+  } else if (normalized <= 1.5) {
+    niceNormalized = 1.5
   } else if (normalized <= 2) {
     niceNormalized = 2
   } else if (normalized <= 2.5) {
@@ -235,7 +275,6 @@ const getYAxisScale = (
     ticks
   }
 }
-
 
 const removeOutliers = <T extends {
   date: string
@@ -415,6 +454,13 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
   const clearFilters = () => {
     setSelectedYear('')
     setSelectedMonth('')
+    setSelectedYear2(selectedYear)
+    setSelectedMonth2(selectedMonth)
+  }
+
+    const clearFilters2 = () => {
+    setSelectedYear2(selectedYear)
+    setSelectedMonth2(selectedMonth)
   }
 
   // Calculate max for category bars
@@ -446,6 +492,8 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
               onChange={(e) => {
                 setSelectedYear(e.target.value)
                 setSelectedMonth('')
+                setSelectedYear2(e.target.value)
+                setSelectedMonth2('')
               }}
               className="border rounded-lg px-3 py-2 min-w-[120px]"
             >
@@ -460,7 +508,10 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
             <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
             <select
               value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
+              onChange={(e) => {
+                setSelectedMonth(e.target.value)
+                setSelectedMonth2(e.target.value)
+              }}
               className="border rounded-lg px-3 py-2 min-w-[140px]"
               disabled={!selectedYear}
             >
@@ -586,6 +637,60 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
             {categories.length === 0 && (
               <p className="text-gray-500 text-center py-4">No category data available</p>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Date Filters 2 */}
+      <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border">
+        <div className="flex flex-wrap items-end gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+            <select
+              value={selectedYear2}
+              onChange={(e) => {
+                setSelectedYear2(e.target.value)
+                setSelectedMonth2('')
+              }}
+              className="border rounded-lg px-3 py-2 min-w-[120px]"
+            >
+              <option value="">All Years</option>
+              {availableYears.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+            <select
+              value={selectedMonth2}
+              onChange={(e) => setSelectedMonth2(e.target.value)}
+              className="border rounded-lg px-3 py-2 min-w-[140px]"
+              disabled={!selectedYear2}
+            >
+              <option value="">All Months</option>
+              {availableMonths2.map(month => (
+                <option key={month} value={month}>{monthNames[month]}</option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={clearFilters2}
+            className="px-4 py-2 text-gray-600 border rounded-lg hover:bg-gray-50"
+          >
+            Clear Filters
+          </button>
+
+          <div className="ml-auto text-sm text-gray-500">
+            {availableYears.length > 0 ? (
+              <>Data available: {availableYears[availableYears.length - 1]} - {availableYears[0]}</>
+            ) : (
+              'No data available'
+            )}
+            {' • '}
+            Showing {filteredData.length} data points
           </div>
         </div>
       </div>
