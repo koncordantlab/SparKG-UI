@@ -58,8 +58,16 @@ export default function YouTubeDashboard() {
   const [selectedYear, setSelectedYear] = useState<string>('')
   const [selectedMonth, setSelectedMonth] = useState<string>('')
 
-  const [selectedYear2, setSelectedYear2] = useState<string>(selectedYear)
-  const [selectedMonth2, setSelectedMonth2] = useState<string>(selectedMonth)
+  const [selectedChartYear, setSelectedChartYear] = useState<string>(selectedYear)
+  const [selectedChartMonth, setSelectedChartMonth] = useState<string>(selectedMonth)
+  //
+  const [selectedRange, setSelectedRange] = useState<number>(0) // 0 = no range, 30 = last 30 days, 60 = last 60 days
+  const [selectedChartRange, setSelectedChartRange] = useState<number>(selectedRange)
+  const [nonChartData, setNonChartData] = useState<number>(0)
+
+  /*const nonChartData = useMemo(() => {
+    return filteredData.length
+  },[weeklyData, selectedYear, selectedMonth, selectedRange])*/
 
   // Extract available years from data (date format: "2025-01-15")
   const availableYears = useMemo(() => {
@@ -84,17 +92,17 @@ export default function YouTubeDashboard() {
     return Array.from(months).sort()
   }, [weeklyData, selectedYear])
 
-  const availableMonths2 = useMemo(() => {
-    if (!selectedYear2) return []
+  const availableChartMonths = useMemo(() => {
+    if (!selectedChartYear) return []
     const months = new Set<string>()
     weeklyData
-      .filter(d => d.date?.startsWith(selectedYear2))
+      .filter(d => d.date?.startsWith(selectedChartYear))
       .forEach(d => {
         const month = d.date?.split('-')[1]
         if (month) months.add(month)
       })
     return Array.from(months).sort()
-  }, [weeklyData, selectedYear2])
+  }, [weeklyData, selectedChartYear])
 
   useEffect(() => {
     loadData()
@@ -105,8 +113,16 @@ export default function YouTubeDashboard() {
   }, [weeklyData, selectedYear, selectedMonth])
 
   useEffect(() => {
-    filterData2()
-  }, [weeklyData, selectedYear2, selectedMonth2])
+    filterChartData()
+  }, [weeklyData, selectedChartYear, selectedChartMonth])
+
+  useEffect(() => {
+    filterRangeData()
+  }, [weeklyData, selectedRange])
+
+  useEffect(() => {
+    filterChartRangeData()
+  }, [weeklyData, selectedChartRange])
 
   const loadData = async () => {
     try {
@@ -128,24 +144,7 @@ export default function YouTubeDashboard() {
     }
   }
 
-  const filterData = () => {
-    let data = [...weeklyData]
-
-    // Filter by year (date format: "2025-01-15")
-    if (selectedYear) {
-      data = data.filter(d => d.date?.startsWith(selectedYear.toString()))
-    }
-
-    // Filter by month
-    if (selectedMonth) {
-      data = data.filter(d => {
-        const month = d.date?.split('-')[1]
-        return month === selectedMonth
-      })
-    }
-
-    setFilteredData(data)
-
+  const recalculateStats = (data: WeeklyData[]) => {
     // Recalculate stats and top drugs based on filtered data
     const drugMentions = data.reduce((acc: Record<string, { mentions: number, views: number }>, item: WeeklyData) => {
       if (!acc[item.scientific_name]) {
@@ -183,24 +182,95 @@ export default function YouTubeDashboard() {
     setStats(totalStats)
   }
 
-const filterData2 = () => {
+  const filterData = () => {
     let data = [...weeklyData]
 
     // Filter by year (date format: "2025-01-15")
-    if (selectedYear2) {
-      data = data.filter(d => d.date?.startsWith(selectedYear2.toString()))
+    if (selectedYear) {
+      data = data.filter(d => d.date?.startsWith(selectedYear.toString()))
     }
 
     // Filter by month
-    if (selectedMonth2) {
+    if (selectedMonth) {
       data = data.filter(d => {
         const month = d.date?.split('-')[1]
-        return month === selectedMonth2
+        return month === selectedMonth
       })
     }
 
     setFilteredData(data)
+
+    recalculateStats(data)
+    setNonChartData(data.length)
   }
+
+const filterRangeData = () => {
+  if (selectedRange != 0) {
+
+    let data = [...weeklyData]
+
+    data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+    let endData = new Date(data[data.length - 1].date)
+    let startData = new Date(endData)
+    startData.setDate(startData.getDate() - selectedRange - 1) // Last x days
+
+    data = data.filter(d => {
+      const itemDate = new Date(d.date)
+      return itemDate >= startData && itemDate <= endData
+    }) //not 100% sure about this code
+
+    
+    setFilteredData(data)
+    recalculateStats(data)
+    setNonChartData(data.length)
+  }
+  else { filterData() }
+  
+}
+
+const filterChartData = () => {
+    let data = [...weeklyData]
+
+    // Filter by year (date format: "2025-01-15")
+    if (selectedChartYear) {
+      data = data.filter(d => d.date?.startsWith(selectedChartYear.toString()))
+    }
+
+    // Filter by month
+    if (selectedChartMonth) {
+      data = data.filter(d => {
+        const month = d.date?.split('-')[1]
+        return month === selectedChartMonth
+      })
+    }
+
+    setFilteredData(data)
+}
+
+const filterChartRangeData = () => {
+
+  if (selectedChartRange != 0) {
+
+    let data = [...weeklyData]
+
+    data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+    let endData = new Date(data[data.length - 1].date)
+    let startData = new Date(endData)
+    startData.setDate(startData.getDate() - selectedChartRange - 1) // Last x days
+
+    data = data.filter(d => {
+      const itemDate = new Date(d.date)
+      return itemDate >= startData && itemDate <= endData
+    }) //not 100% sure about this code
+
+    
+    setFilteredData(data)
+  
+  }
+  else { filterChartData() }
+}
 
   // Format date string (e.g., "2025-01-15") to display format
   // Parse manually to avoid timezone issues with Date constructor
@@ -454,13 +524,16 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
   const clearFilters = () => {
     setSelectedYear('')
     setSelectedMonth('')
-    setSelectedYear2(selectedYear)
-    setSelectedMonth2(selectedMonth)
+    setSelectedChartYear('')
+    setSelectedChartMonth('')
+    setSelectedRange(0)
+    setSelectedChartRange(0)
   }
 
-    const clearFilters2 = () => {
-    setSelectedYear2(selectedYear)
-    setSelectedMonth2(selectedMonth)
+    const clearChartFilters = () => {
+    setSelectedChartYear(selectedYear)
+    setSelectedChartMonth(selectedMonth)
+    setSelectedChartRange(selectedRange)
   }
 
   // Calculate max for category bars
@@ -492,8 +565,10 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
               onChange={(e) => {
                 setSelectedYear(e.target.value)
                 setSelectedMonth('')
-                setSelectedYear2(e.target.value)
-                setSelectedMonth2('')
+                setSelectedChartYear(e.target.value)
+                setSelectedChartMonth('')
+                setSelectedRange(0)
+                setSelectedChartRange(0)
               }}
               className="border rounded-lg px-3 py-2 min-w-[120px]"
             >
@@ -510,7 +585,9 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
               value={selectedMonth}
               onChange={(e) => {
                 setSelectedMonth(e.target.value)
-                setSelectedMonth2(e.target.value)
+                setSelectedChartMonth(e.target.value)
+                setSelectedRange(0)
+                setSelectedChartRange(0)
               }}
               className="border rounded-lg px-3 py-2 min-w-[140px]"
               disabled={!selectedYear}
@@ -519,6 +596,26 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
               {availableMonths.map(month => (
                 <option key={month} value={month}>{monthNames[month]}</option>
               ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+            <select
+              value={selectedRange}
+              onChange={(e) => {
+                setSelectedYear('')
+                setSelectedMonth('')
+                setSelectedChartYear('')
+                setSelectedChartMonth('')
+                setSelectedRange(Number(e.target.value))
+                setSelectedChartRange(Number(e.target.value))
+              }}
+              className="border rounded-lg px-3 py-2 min-w-[140px]"
+            >
+              <option value={0}>-</option>
+              <option value={30}>Last 30 Days</option>
+              <option value={60}>Last 60 Days</option>
             </select>
           </div>
 
@@ -536,7 +633,7 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
               'No data available'
             )}
             {' • '}
-            Showing {filteredData.length} data points
+            Showing {nonChartData} data points
           </div>
         </div>
       </div>
@@ -647,10 +744,11 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
             <select
-              value={selectedYear2}
+              value={selectedChartYear}
               onChange={(e) => {
-                setSelectedYear2(e.target.value)
-                setSelectedMonth2('')
+                setSelectedChartYear(e.target.value)
+                setSelectedChartMonth('')
+                setSelectedChartRange(0)
               }}
               className="border rounded-lg px-3 py-2 min-w-[120px]"
             >
@@ -664,20 +762,40 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
             <select
-              value={selectedMonth2}
-              onChange={(e) => setSelectedMonth2(e.target.value)}
+              value={selectedChartMonth}
+              onChange={(e) => {
+                setSelectedChartMonth(e.target.value)
+                setSelectedChartRange(0)
+              }}
               className="border rounded-lg px-3 py-2 min-w-[140px]"
-              disabled={!selectedYear2}
+              disabled={!selectedChartYear}
             >
               <option value="">All Months</option>
-              {availableMonths2.map(month => (
+              {availableChartMonths.map(month => (
                 <option key={month} value={month}>{monthNames[month]}</option>
               ))}
             </select>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+            <select
+              value={selectedChartRange}
+              onChange={(e) => {
+                setSelectedChartYear('')
+                setSelectedChartMonth('')
+                setSelectedChartRange(Number(e.target.value))
+              }}
+              className="border rounded-lg px-3 py-2 min-w-[140px]"
+            >
+              <option value={0}>-</option>
+              <option value={30}>Last 30 Days</option>
+              <option value={60}>Last 60 Days</option>
+            </select>
+          </div>
+
           <button
-            onClick={clearFilters2}
+            onClick={clearChartFilters}
             className="px-4 py-2 text-gray-600 border rounded-lg hover:bg-gray-50"
           >
             Clear Filters
