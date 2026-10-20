@@ -58,6 +58,13 @@ export default function RedditDashboard() {
   const [selectedYear, setSelectedYear] = useState<string>('')
   const [selectedMonth, setSelectedMonth] = useState<string>('')
 
+  const [selectedChartYear, setSelectedChartYear] = useState<string>(selectedYear)
+  const [selectedChartMonth, setSelectedChartMonth] = useState<string>(selectedMonth)
+  //
+  const [selectedRange, setSelectedRange] = useState<number>(0) // 0 = no range, 30 = last 30 days, 60 = last 60 days
+  const [selectedChartRange, setSelectedChartRange] = useState<number>(selectedRange)
+  const [nonChartData, setNonChartData] = useState<number>(0)
+
   // Extract available years from data (date format: "2026-01-02")
   const availableYears = useMemo(() => {
     const years = new Set<string>()
@@ -80,6 +87,18 @@ export default function RedditDashboard() {
       })
     return Array.from(months).sort()
   }, [dailyData, selectedYear])
+
+  const availableChartMonths = useMemo(() => {
+    if (!selectedChartYear) return []
+    const months = new Set<string>()
+    dailyData
+      .filter(d => d.date?.startsWith(selectedChartYear))
+      .forEach(d => {
+        const month = d.date?.split('-')[1]
+        if (month) months.add(month)
+      })
+    return Array.from(months).sort()
+  }, [dailyData, selectedChartYear])
 
   useEffect(() => {
     loadData()
@@ -109,24 +128,19 @@ export default function RedditDashboard() {
     }
   }
 
-  const filterData = () => {
-    let data = [...dailyData]
+  useEffect(() => {
+    filterChartData()
+  }, [dailyData, selectedChartYear, selectedChartMonth])
 
-    // Filter by year (date format: "2026-01-02")
-    if (selectedYear) {
-      data = data.filter(d => d.date.startsWith(selectedYear))
-    }
+  useEffect(() => {
+    filterRangeData()
+  }, [dailyData, selectedRange])
 
-    // Filter by month
-    if (selectedMonth) {
-      data = data.filter(d => {
-        const [year, month] = d.date.split('-')
-        return year === selectedYear && month === selectedMonth
-      })
-    }
+  useEffect(() => {
+    filterChartRangeData()
+  }, [dailyData, selectedChartRange])
 
-    setFilteredData(data)
-
+const recalculateStats = (data: DailyData[]) => {
     // Recalculate stats and top drugs based on filtered data
     const drugMentions = data.reduce((acc: Record<string, number>, item: DailyData) => {
       acc[item.scientific_name] = (acc[item.scientific_name] || 0) + item.mentions
@@ -161,6 +175,130 @@ export default function RedditDashboard() {
     }), { total_posts: 0, total_score: 0, total_comments: 0 })
     setStats(totalStats)
   }
+
+const filterData = () => {
+    let data = [...dailyData]
+
+    // Filter by year (date format: "2026-01-02")
+    if (selectedYear) {
+      data = data.filter(d => d.date.startsWith(selectedYear))
+    }
+
+    // Filter by month
+    if (selectedMonth) {
+      data = data.filter(d => {
+        const [year, month] = d.date.split('-')
+        return year === selectedYear && month === selectedMonth
+      })
+    }
+
+    setFilteredData(data)
+
+    // Recalculate stats and top drugs based on filtered data
+    /*const drugMentions = data.reduce((acc: Record<string, number>, item: DailyData) => {
+      acc[item.scientific_name] = (acc[item.scientific_name] || 0) + item.mentions
+      return acc
+    }, {})
+
+    const topDrugNames = Object.entries(drugMentions)
+      .sort(([,a], [,b]) => (b as number) - (a as number))
+      .slice(0, 5)
+      .map(([name]) => name)
+
+    if (selectedDrugs.length === 0 || !selectedDrugs.some(d => topDrugNames.includes(d))) {
+      setSelectedDrugs(topDrugNames)
+    }
+
+    const topDrugsCalc = Object.entries(drugMentions)
+      .map(([name, mentions]) => ({
+        scientific_name: name,
+        mentions: mentions as number,
+        total_score: data
+          .filter((d: DailyData) => d.scientific_name === name)
+          .reduce((sum: number, d: DailyData) => sum + (d.total_engagement || 0), 0)
+      }))
+      .sort((a, b) => b.mentions - a.mentions)
+      .slice(0, 10)
+    setTopDrugs(topDrugsCalc)
+
+    const totalStats = data.reduce((acc: typeof stats, item: DailyData) => ({
+      total_posts: acc.total_posts + item.mentions,
+      total_score: acc.total_score + (item.total_engagement || 0),
+      total_comments: acc.total_comments + (item.total_comments || 0)
+    }), { total_posts: 0, total_score: 0, total_comments: 0 })
+    setStats(totalStats)*/
+    recalculateStats(data)
+  }
+
+const filterRangeData = () => {
+  if (selectedRange != 0) {
+
+    let data = [...dailyData]
+
+    data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+    let endData = new Date(data[data.length - 1].date)
+    let startData = new Date(endData)
+    startData.setDate(startData.getDate() - selectedRange - 1) // Last x days
+
+    data = data.filter(d => {
+      const itemDate = new Date(d.date)
+      return itemDate >= startData && itemDate <= endData
+    }) //not 100% sure about this code
+
+    
+    setFilteredData(data)
+    recalculateStats(data)
+    setNonChartData(data.length)
+  }
+  else { filterData() }
+  
+}
+
+const filterChartData = () => {
+    let data = [...dailyData]
+
+    // Filter by year (date format: "2025-01-15")
+    if (selectedChartYear) {
+      data = data.filter(d => d.date?.startsWith(selectedChartYear.toString()))
+    }
+
+    // Filter by month
+    if (selectedChartMonth) {
+      data = data.filter(d => {
+        const month = d.date?.split('-')[1]
+        return month === selectedChartMonth
+      })
+    }
+
+    setFilteredData(data)
+}
+
+const filterChartRangeData = () => {
+
+  if (selectedChartRange != 0) {
+
+    let data = [...dailyData]
+
+    data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+    let endData = new Date(data[data.length - 1].date)
+    let startData = new Date(endData)
+    startData.setDate(startData.getDate() - selectedChartRange - 1) // Last x days
+
+    data = data.filter(d => {
+      const itemDate = new Date(d.date)
+      return itemDate >= startData && itemDate <= endData
+    }) //not 100% sure about this code
+
+    
+    setFilteredData(data)
+  
+  }
+  else { filterChartData() }
+}
+
+  
 
   // Format date string (e.g., "2026-01-02") to display format
   // Parse manually to avoid timezone issues with Date constructor
@@ -217,6 +355,8 @@ export default function RedditDashboard() {
 
     if (normalized <= 1) {
       niceNormalized = 1
+    } else if (normalized <= 1.5) {
+      niceNormalized = 1.5
     } else if (normalized <= 2) {
       niceNormalized = 2
     } else if (normalized <= 2.5) {
@@ -431,6 +571,10 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
   const clearFilters = () => {
     setSelectedYear('')
     setSelectedMonth('')
+    setSelectedChartYear('')
+    setSelectedChartMonth('')
+    setSelectedRange(0)
+    setSelectedChartRange(0)
   }
 
   //This code is for trying to space the labels out in the graph
@@ -472,6 +616,12 @@ const getLabelRadiusOffsets = (
 
   return offsets;
 };
+
+const clearChartFilters = () => {
+    setSelectedChartYear(selectedYear)
+    setSelectedChartMonth(selectedMonth)
+    setSelectedChartRange(selectedRange)
+}
 
 const resolveLabelCollisions = (
   data: { name: string; value: number }[],
@@ -805,6 +955,10 @@ const labelRadiusOffsets =
               onChange={(e) => {
                 setSelectedYear(e.target.value)
                 setSelectedMonth('') // Reset month when year changes
+                setSelectedChartYear(e.target.value)
+                setSelectedChartMonth('')
+                setSelectedRange(0)
+                setSelectedChartRange(0)
               }}
               className="border rounded-lg px-3 py-2 min-w-[120px]"
             >
@@ -819,7 +973,12 @@ const labelRadiusOffsets =
             <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
             <select
               value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
+              onChange={(e) => {
+                setSelectedMonth(e.target.value)
+                setSelectedChartMonth(e.target.value)
+                setSelectedRange(0)
+                setSelectedChartRange(0)
+              }}
               className="border rounded-lg px-3 py-2 min-w-[140px]"
               disabled={!selectedYear}
             >
@@ -832,6 +991,26 @@ const labelRadiusOffsets =
                   </option>
                 )
               })}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+            <select
+              value={selectedRange}
+              onChange={(e) => {
+                setSelectedYear('')
+                setSelectedMonth('')
+                setSelectedChartYear('')
+                setSelectedChartMonth('')
+                setSelectedRange(Number(e.target.value))
+                setSelectedChartRange(Number(e.target.value))
+              }}
+              className="border rounded-lg px-3 py-2 min-w-[140px]"
+            >
+              <option value={0}>-</option>
+              <option value={30}>Last 30 Days</option>
+              <option value={60}>Last 60 Days</option>
             </select>
           </div>
 
@@ -849,7 +1028,7 @@ const labelRadiusOffsets =
               'No data available'
             )}
             {' • '}
-            Showing {filteredData.length} data points
+            Showing {nonChartData} data points
           </div>
         </div>
       </div>
@@ -941,6 +1120,86 @@ const labelRadiusOffsets =
                 <Tooltip formatter={(value) => formatNumber(value as number)} />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+{/* Date Filters 2 */}
+      <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border">
+        <div className="flex flex-wrap items-end gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+            <select
+              value={selectedChartYear}
+              onChange={(e) => {
+                setSelectedChartYear(e.target.value)
+                setSelectedChartMonth('')
+                setSelectedChartRange(0)
+              }}
+              className="border rounded-lg px-3 py-2 min-w-[120px]"
+            >
+              <option value="">All Years</option>
+              {availableYears.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+            <select
+              value={selectedChartMonth}
+              onChange={(e) => {
+                setSelectedChartMonth(e.target.value)
+                setSelectedChartRange(0)
+              }}
+              className="border rounded-lg px-3 py-2 min-w-[140px]"
+              disabled={!selectedChartYear}
+            >
+              <option value="">All Months</option>
+              {selectedChartYear && availableChartMonths.map(month => {
+                const monthOption = monthOptions.find(m => m.value === month)
+                return (
+                  <option key={month} value={month}>
+                    {monthOption?.label || month}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+            <select
+              value={selectedChartRange}
+              onChange={(e) => {
+                setSelectedChartYear('')
+                setSelectedChartMonth('')
+                setSelectedChartRange(Number(e.target.value))
+              }}
+              className="border rounded-lg px-3 py-2 min-w-[140px]"
+            >
+              <option value={0}>-</option>
+              <option value={30}>Last 30 Days</option>
+              <option value={60}>Last 60 Days</option>
+            </select>
+          </div>
+
+          <button
+            onClick={clearChartFilters}
+            className="px-4 py-2 text-gray-600 border rounded-lg hover:bg-gray-50"
+          >
+            Clear Filters
+          </button>
+
+          <div className="ml-auto text-sm text-gray-500">
+            {availableYears.length > 0 ? (
+              <>Data available: {availableYears[availableYears.length - 1]} - {availableYears[0]}</>
+            ) : (
+              'No data available'
+            )}
+            {' • '}
+            Showing {filteredData.length} data points
           </div>
         </div>
       </div>

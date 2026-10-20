@@ -65,10 +65,6 @@ export default function YouTubeDashboard() {
   const [selectedChartRange, setSelectedChartRange] = useState<number>(selectedRange)
   const [nonChartData, setNonChartData] = useState<number>(0)
 
-  /*const nonChartData = useMemo(() => {
-    return filteredData.length
-  },[weeklyData, selectedYear, selectedMonth, selectedRange])*/
-
   // Extract available years from data (date format: "2025-01-15")
   const availableYears = useMemo(() => {
     const years = new Set<string>()
