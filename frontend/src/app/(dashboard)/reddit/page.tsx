@@ -193,6 +193,7 @@ const filterData = () => {
     }
 
     setFilteredData(data)
+    setNonChartData(data.length)
 
     // Recalculate stats and top drugs based on filtered data
     /*const drugMentions = data.reduce((acc: Record<string, number>, item: DailyData) => {
