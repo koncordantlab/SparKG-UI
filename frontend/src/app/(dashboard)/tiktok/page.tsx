@@ -44,6 +44,21 @@ interface DrugBreakdown {
   category: string
 }
 
+interface FilteredDrugBreakdown {
+  scientific_name: string
+  video_count: number
+  total_views: number
+  avg_views: number
+  avg_confidence?: number
+  category: string
+}
+
+interface FilteredCategoryBreakdown {
+  category: string
+  video_count: number
+  total_views: number
+}
+
 interface RecentVideo {
   video_id: string
   description: string
@@ -118,6 +133,8 @@ export default function TikTokDashboard() {
   const [selectedRange, setSelectedRange] = useState<number>(0) // 0 = no range, 30 = last 30 days, 60 = last 60 days
   const [selectedChartRange, setSelectedChartRange] = useState<number>(selectedRange)
   const [nonChartData, setNonChartData] = useState<number>(0)
+
+  const [filterStats, setFilterStats] = useState({ total_views: 0, total_videos: 0, total_drugs: 0, drugs_breakdown: [] as FilteredDrugBreakdown[], category_breakdown: [] as FilteredCategoryBreakdown[] })
 
   //note: might need to grab the usememos and the filtered data from reddit, not sure yet.
 
@@ -209,9 +226,9 @@ export default function TikTokDashboard() {
 
   //everytihing below is for the line graphs
 
-  const recalculateStats = (data: DailyData[]) => {
+  /*const recalculateStats = (data: DailyData[]) => {
     // Recalculate stats and top drugs based on filtered data
-    /*const drugMentions = data.reduce((acc: Record<string, { mentions: number, views: number }>, item: DailyData) => {
+    const drugMentions = data.reduce((acc: Record<string, { mentions: number, views: number }>, item: DailyData) => {
       if (!acc[item.scientific_name]) {
         acc[item.scientific_name] = { mentions: 0, views: 0 }
       }
@@ -239,12 +256,13 @@ export default function TikTokDashboard() {
       .slice(0, 10)
     setTopDrugs(topDrugsCalc)
 
-    const totalStats = data.reduce((acc: typeof stats, item: DailyData) => ({
-      mentions: acc.mentions + item.mentions,
-      total_likes: acc.total_likes + (item.total_likes || 0)
-    }), { mentions: 0, total_views: 0, total_likes: 0 })
-    setStats(totalStats)*/
-    const drugMentions = data.reduce((acc: Record<string, number>, item: DailyData) => {
+    const totalStats = data.reduce((acc: typeof filterStats, item: DailyData) => ({
+      total_views: acc.total_views + (item.total_views || 0),
+      total_videos: acc.total_videos + (item.total_videos || 0),
+      total_drugs: acc.total_drugs + (item.total_drugs || 0)
+    }), { total_views: 0, total_mentions: 0,total_drugs: 0 })
+    setFilterStats(totalStats)
+    /*const drugMentions = data.reduce((acc: Record<string, number>, item: DailyData) => {
       acc[item.scientific_name] = (acc[item.scientific_name] || 0) + item.mentions
       return acc
     }, {})
@@ -269,7 +287,213 @@ export default function TikTokDashboard() {
       .sort((a, b) => b.mentions - a.mentions)
       .slice(0, 10)
     setTopDrugs(topDrugsCalc)
+
+    const totalStats = data.reduce((acc: typeof stats, item: TikTokStats) => ({
+      total_views: acc.total_views + (item.total_views || 0),
+      total_videos: acc.total_videos + (item.total_videos || 0),
+      total_likes: acc.total_likes + (item.total_likes || 0)
+    }), { mentions: 0, total_views: 0, total_likes: 0 })
+    setStats(totalStats)
+  }*/
+ const recalculateStats = (data: DailyData[]) => {
+  // Calculate mentions per drug
+  const drugMentions = data.reduce(
+    (acc: Record<string, number>, item: DailyData) => {
+      acc[item.scientific_name] =
+        (acc[item.scientific_name] || 0) + item.mentions
+
+      return acc
+    },
+    {}
+  )
+
+  // Get top 5 drugs
+  const topDrugNames = Object.entries(drugMentions)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5)
+    .map(([name]) => name)
+
+  if (
+    selectedDrugs.length === 0 ||
+    !selectedDrugs.some(d => topDrugNames.includes(d))
+  ) {
+    setSelectedDrugs(topDrugNames)
   }
+
+  // Calculate top drug information
+  const topDrugsCalc = Object.entries(drugMentions)
+    .map(([name, mentions]) => ({
+      scientific_name: name,
+      mentions,
+      total_views: data
+        .filter((d: DailyData) => d.scientific_name === name)
+        .reduce(
+          (sum: number, d: DailyData) =>
+            sum + (d.total_views || 0),
+          0
+        )
+    }))
+    .sort((a, b) => b.mentions - a.mentions)
+    .slice(0, 10)
+
+  setTopDrugs(topDrugsCalc)
+
+  // Recalculate summary stats from filtered data
+  /*const totalStats = {
+    total_views: data.reduce(
+      (sum, item) => sum + (item.total_views || 0),
+      0
+    ),
+
+    total_videos: data.reduce(
+      (sum, item) => sum + item.mentions,
+      0
+    ),
+
+    total_drugs: new Set(
+      data.map(item => item.scientific_name)
+    ).size
+  }
+
+  setFilterStats(totalStats)*/
+  const breakdownMap = data.reduce(
+  (
+    acc: Record<
+      string,
+      {
+        scientific_name: string
+        video_count: number
+        total_views: number
+      }
+    >,
+    item: DailyData
+  ) => {
+    if (!acc[item.scientific_name]) {
+      acc[item.scientific_name] = {
+        scientific_name: item.scientific_name,
+        video_count: 0,
+        total_views: 0
+      }
+    }
+
+    acc[item.scientific_name].video_count += item.mentions
+    acc[item.scientific_name].total_views += item.total_views || 0
+
+    return acc
+  },
+  {}
+  
+)
+
+/*const filteredDrugBreakdown: FilteredDrugBreakdown[] =
+  Object.values(breakdownMap)
+    .map(drug => ({
+      ...drug,
+      avg_views:
+        drug.video_count > 0
+          ? drug.total_views / drug.video_count
+          : 0
+    }))
+    .sort((a, b) => b.video_count - a.video_count)*/
+const filteredDrugBreakdown: FilteredDrugBreakdown[] =
+  Object.values(breakdownMap)
+    .map(drug => {
+      const originalDrug = drugsBreakdown.find(
+        d => d.scientific_name === drug.scientific_name
+      )
+
+      return {
+        ...drug,
+
+        avg_views:
+          drug.video_count > 0
+            ? drug.total_views / drug.video_count
+            : 0,
+
+        category: originalDrug?.category ?? 'unknown',
+
+        avg_confidence:
+          originalDrug?.avg_confidence ?? 0
+      }
+    })
+    .sort((a, b) => b.video_count - a.video_count)
+
+const categoryMap = filteredDrugBreakdown.reduce(
+  (
+    acc: Record<
+      string,
+      {
+        category: string
+        video_count: number
+        total_views: number
+      }
+    >,
+    drug
+  ) => {
+    const category = drug.category ?? "unknown"
+
+    if (!acc[category]) {
+      acc[category] = {
+        category,
+        video_count: 0,
+        total_views: 0
+      }
+    }
+
+    acc[category].video_count += drug.video_count
+    acc[category].total_views += drug.total_views
+
+    return acc
+  },
+  {}
+)
+
+const filteredCategoryBreakdown: FilteredCategoryBreakdown[] =
+  Object.values(categoryMap)
+    .sort((a, b) => b.video_count - a.video_count)    
+
+/*const totalStats = {
+  total_views: data.reduce(
+    (sum, item) => sum + (item.total_views || 0),
+    0
+  ),
+
+  total_videos: data.reduce(
+    (sum, item) => sum + item.mentions,
+    0
+  ),
+
+  total_drugs: new Set(
+    data.map(item => item.scientific_name)
+  ).size,
+
+  drugs_breakdown: filteredDrugBreakdown
+}*/
+const totalStats = {
+  total_views: data.reduce(
+    (sum, item) => sum + (item.total_views || 0),
+    0
+  ),
+
+  total_videos: data.reduce(
+    (sum, item) => sum + item.mentions,
+    0
+  ),
+
+  total_drugs: new Set(
+    data.map(item => item.scientific_name)
+  ).size,
+
+  drugs_breakdown: filteredDrugBreakdown,
+
+  category_breakdown: filteredCategoryBreakdown
+}
+
+setFilterStats(totalStats)
+
+
+setFilterStats(totalStats)
+}
 
   const filterData = () => {
     let data = [...dailyData]
@@ -655,7 +879,7 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
   }
 
   // Calculate max video count for bar widths
-  const maxVideos = Math.max(...(drugsBreakdown || []).map(d => d.video_count), 1)
+  const maxVideos = Math.max(...(filterStats.drugs_breakdown || []).map(d => d.video_count), 1)
 
   if (loading) {
     return (
@@ -672,6 +896,21 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
         <h1 className="text-2xl font-bold text-gray-900">TikTok Dashboard</h1>
         <p className="text-gray-500">Drug mention analytics from classified TikTok videos</p>
       </div>
+
+      {/* Averages Row */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="bg-gray-900 rounded-xl shadow-sm p-4 text-white">
+          <p className="text-sm text-gray-400">Avg. Views per Video</p>
+          <p className="text-2xl font-bold">{formatNumber(stats?.avg_views_per_video || 0)}</p>
+        </div>
+        <div className="bg-gray-800 rounded-xl shadow-sm p-4 text-white">
+          <p className="text-sm text-gray-400">Avg. Likes per Video</p>
+          <p className="text-2xl font-bold">{formatNumber(stats?.avg_likes_per_video || 0)}</p>
+        </div>
+      </div>
+
+      
+        
 
       {/* Date Filters */} 
       <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border">
@@ -772,7 +1011,7 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
             </div>
             <div>
               <p className="text-xs text-gray-500">Videos</p>
-              <p className="text-xl font-bold text-gray-900">{formatNumber(stats?.total_videos || 0)}</p>
+              <p className="text-xl font-bold text-gray-900">{formatNumber(filterStats?.total_videos || 0)}</p>
             </div>
           </div>
         </div>
@@ -787,12 +1026,12 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
             </div>
             <div>
               <p className="text-xs text-gray-500">Total Views</p>
-              <p className="text-xl font-bold text-gray-900">{formatNumber(stats?.total_views || 0)}</p>
+              <p className="text-xl font-bold text-gray-900">{formatNumber(filterStats?.total_views || 0)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-4 border">
+        {/* <div className="bg-white rounded-xl shadow-sm p-4 border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -804,7 +1043,7 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
               <p className="text-xl font-bold text-gray-900">{formatNumber(stats?.total_likes || 0)}</p>
             </div>
           </div>
-        </div>
+        </div>*/}
 
         <div className="bg-white rounded-xl shadow-sm p-4 border">
           <div className="flex items-center gap-3">
@@ -815,33 +1054,22 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
             </div>
             <div>
               <p className="text-xs text-gray-500">Unique Drugs</p>
-              <p className="text-xl font-bold text-gray-900">{stats?.unique_drugs || 0}</p>
+              <p className="text-xl font-bold text-gray-900">{filterStats?.total_drugs || 0}</p>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Averages Row */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-gray-900 rounded-xl shadow-sm p-4 text-white">
-          <p className="text-sm text-gray-400">Avg. Views per Video</p>
-          <p className="text-2xl font-bold">{formatNumber(stats?.avg_views_per_video || 0)}</p>
-        </div>
-        <div className="bg-gray-800 rounded-xl shadow-sm p-4 text-white">
-          <p className="text-sm text-gray-400">Avg. Likes per Video</p>
-          <p className="text-2xl font-bold">{formatNumber(stats?.avg_likes_per_video || 0)}</p>
-        </div>
-      </div>
-
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Drugs Breakdown */}
+      {/* Drugs Breakdown */}
         <div className="bg-white rounded-xl shadow-sm p-6 border">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">Drugs by Video Count</h3>
-            <span className="text-sm text-gray-500">{drugsBreakdown.length} drugs</span>
+            {/*<span className="text-sm text-gray-500">{drugsBreakdown.length} drugs</span>*/}
+            <span className="text-sm text-gray-500">{filterStats?.total_drugs || 0} drugs</span>
           </div>
           <div className="space-y-3 max-h-80 overflow-y-auto">
-            {drugsBreakdown.map((drug) => (
+            {filterStats.drugs_breakdown.map((drug) => (
               <div key={drug.scientific_name} className="group">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
@@ -867,11 +1095,11 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
                 </div>
                 <div className="flex gap-4 mt-1 text-xs text-gray-400">
                   <span>{formatNumber(drug.total_views)} views</span>
-                  <span>{formatNumber(drug.total_likes)} likes</span>
+                  {/* <span>{formatNumber(drug.total_likes)} likes</span> */}
                 </div>
               </div>
             ))}
-            {drugsBreakdown.length === 0 && (
+            {filterStats.drugs_breakdown.length === 0 && (
               <p className="text-gray-500 text-center py-4">No drug data available</p>
             )}
           </div>
@@ -881,8 +1109,8 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
         <div className="bg-white rounded-xl shadow-sm p-6 border">
           <h3 className="text-lg font-semibold mb-4">Videos by Category</h3>
           <div className="space-y-4 max-h-80 overflow-y-auto"> {/* Added the max height and overflow y auto, think that's the scroll wheel */}
-            {categoryBreakdown.map((cat) => {
-              const maxCatVideos = Math.max(...categoryBreakdown.map(c => c.video_count), 1)
+            {filterStats.category_breakdown.map((cat) => {
+              const maxCatVideos = Math.max(...filterStats.category_breakdown.map(c => c.video_count), 1)
               return (
                 <div key={cat.category} className="flex items-center gap-4">
                   <div className="w-24">
@@ -901,13 +1129,13 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
                       {cat.video_count} videos
                     </span>
                   </div>
-                  <div className="w-20 text-right text-xs text-gray-500">
+                  {/*<div className="w-20 text-right text-xs text-gray-500">
                     {formatNumber(cat.total_views)} views
-                  </div>
+                  </div>*/}
                 </div>
               )
             })}
-            {categoryBreakdown.length === 0 && (
+            {filterStats.category_breakdown.length === 0 && (
               <p className="text-gray-500 text-center py-4">No category data available</p>
             )}
           </div>
