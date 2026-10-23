@@ -226,274 +226,159 @@ export default function TikTokDashboard() {
 
   //everytihing below is for the line graphs
 
-  /*const recalculateStats = (data: DailyData[]) => {
-    // Recalculate stats and top drugs based on filtered data
-    const drugMentions = data.reduce((acc: Record<string, { mentions: number, views: number }>, item: DailyData) => {
-      if (!acc[item.scientific_name]) {
-        acc[item.scientific_name] = { mentions: 0, views: 0 }
-      }
-      acc[item.scientific_name].mentions += item.mentions
-      acc[item.scientific_name].views += item.total_views || 0
-      return acc
-    }, {})
-
-    const topDrugNames = Object.entries(drugMentions)
-      .sort(([,a], [,b]) => b.mentions - a.mentions)
-      .slice(0, 5)
-      .map(([name]) => name)
-
-    if (selectedDrugs.length === 0 || !selectedDrugs.some(d => topDrugNames.includes(d))) {
-      setSelectedDrugs(topDrugNames)
-    }
-
-    const topDrugsCalc = Object.entries(drugMentions)
-      .map(([name, data]) => ({
-        scientific_name: name,
-        mentions: data.mentions,
-        total_views: data.views
-      }))
-      .sort((a, b) => b.mentions - a.mentions)
-      .slice(0, 10)
-    setTopDrugs(topDrugsCalc)
-
-    const totalStats = data.reduce((acc: typeof filterStats, item: DailyData) => ({
-      total_views: acc.total_views + (item.total_views || 0),
-      total_videos: acc.total_videos + (item.total_videos || 0),
-      total_drugs: acc.total_drugs + (item.total_drugs || 0)
-    }), { total_views: 0, total_mentions: 0,total_drugs: 0 })
-    setFilterStats(totalStats)
-    /*const drugMentions = data.reduce((acc: Record<string, number>, item: DailyData) => {
-      acc[item.scientific_name] = (acc[item.scientific_name] || 0) + item.mentions
-      return acc
-    }, {})
-
-    const topDrugNames = Object.entries(drugMentions)
-      .sort(([,a], [,b]) => (b as number) - (a as number))
-      .slice(0, 5)
-      .map(([name]) => name)
-
-    if (selectedDrugs.length === 0 || !selectedDrugs.some(d => topDrugNames.includes(d))) {
-      setSelectedDrugs(topDrugNames)
-    }
-
-    const topDrugsCalc = Object.entries(drugMentions)
-      .map(([name, mentions]) => ({
-        scientific_name: name,
-        mentions: mentions as number,
-        total_score: data
-          .filter((d: DailyData) => d.scientific_name === name)
-          .reduce((sum: number, d: DailyData) => sum + (d.total_views || 0), 0)
-      }))
-      .sort((a, b) => b.mentions - a.mentions)
-      .slice(0, 10)
-    setTopDrugs(topDrugsCalc)
-
-    const totalStats = data.reduce((acc: typeof stats, item: TikTokStats) => ({
-      total_views: acc.total_views + (item.total_views || 0),
-      total_videos: acc.total_videos + (item.total_videos || 0),
-      total_likes: acc.total_likes + (item.total_likes || 0)
-    }), { mentions: 0, total_views: 0, total_likes: 0 })
-    setStats(totalStats)
-  }*/
  const recalculateStats = (data: DailyData[]) => {
   // Calculate mentions per drug
-  const drugMentions = data.reduce(
-    (acc: Record<string, number>, item: DailyData) => {
-      acc[item.scientific_name] =
-        (acc[item.scientific_name] || 0) + item.mentions
+      const drugMentions = data.reduce(
+        (acc: Record<string, number>, item: DailyData) => {
+          acc[item.scientific_name] =
+            (acc[item.scientific_name] || 0) + item.mentions
 
-      return acc
-    },
-    {}
-  )
-
-  // Get top 5 drugs
-  const topDrugNames = Object.entries(drugMentions)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5)
-    .map(([name]) => name)
-
-  if (
-    selectedDrugs.length === 0 ||
-    !selectedDrugs.some(d => topDrugNames.includes(d))
-  ) {
-    setSelectedDrugs(topDrugNames)
-  }
-
-  // Calculate top drug information
-  const topDrugsCalc = Object.entries(drugMentions)
-    .map(([name, mentions]) => ({
-      scientific_name: name,
-      mentions,
-      total_views: data
-        .filter((d: DailyData) => d.scientific_name === name)
-        .reduce(
-          (sum: number, d: DailyData) =>
-            sum + (d.total_views || 0),
-          0
-        )
-    }))
-    .sort((a, b) => b.mentions - a.mentions)
-    .slice(0, 10)
-
-  setTopDrugs(topDrugsCalc)
-
-  // Recalculate summary stats from filtered data
-  /*const totalStats = {
-    total_views: data.reduce(
-      (sum, item) => sum + (item.total_views || 0),
-      0
-    ),
-
-    total_videos: data.reduce(
-      (sum, item) => sum + item.mentions,
-      0
-    ),
-
-    total_drugs: new Set(
-      data.map(item => item.scientific_name)
-    ).size
-  }
-
-  setFilterStats(totalStats)*/
-  const breakdownMap = data.reduce(
-  (
-    acc: Record<
-      string,
-      {
-        scientific_name: string
-        video_count: number
-        total_views: number
-      }
-    >,
-    item: DailyData
-  ) => {
-    if (!acc[item.scientific_name]) {
-      acc[item.scientific_name] = {
-        scientific_name: item.scientific_name,
-        video_count: 0,
-        total_views: 0
-      }
-    }
-
-    acc[item.scientific_name].video_count += item.mentions
-    acc[item.scientific_name].total_views += item.total_views || 0
-
-    return acc
-  },
-  {}
-  
-)
-
-/*const filteredDrugBreakdown: FilteredDrugBreakdown[] =
-  Object.values(breakdownMap)
-    .map(drug => ({
-      ...drug,
-      avg_views:
-        drug.video_count > 0
-          ? drug.total_views / drug.video_count
-          : 0
-    }))
-    .sort((a, b) => b.video_count - a.video_count)*/
-const filteredDrugBreakdown: FilteredDrugBreakdown[] =
-  Object.values(breakdownMap)
-    .map(drug => {
-      const originalDrug = drugsBreakdown.find(
-        d => d.scientific_name === drug.scientific_name
+          return acc
+        },
+        {}
       )
 
-      return {
-        ...drug,
+      // Get top 5 drugs
+      const topDrugNames = Object.entries(drugMentions)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 5)
+        .map(([name]) => name)
 
-        avg_views:
-          drug.video_count > 0
-            ? drug.total_views / drug.video_count
-            : 0,
-
-        category: originalDrug?.category ?? 'unknown',
-
-        avg_confidence:
-          originalDrug?.avg_confidence ?? 0
+      if (
+        selectedDrugs.length === 0 ||
+        !selectedDrugs.some(d => topDrugNames.includes(d))
+      ) {
+        setSelectedDrugs(topDrugNames)
       }
-    })
-    .sort((a, b) => b.video_count - a.video_count)
 
-const categoryMap = filteredDrugBreakdown.reduce(
-  (
-    acc: Record<
-      string,
-      {
-        category: string
-        video_count: number
-        total_views: number
-      }
-    >,
-    drug
-  ) => {
-    const category = drug.category ?? "unknown"
+      // Calculate top drug information
+      const topDrugsCalc = Object.entries(drugMentions)
+        .map(([name, mentions]) => ({
+          scientific_name: name,
+          mentions,
+          total_views: data
+            .filter((d: DailyData) => d.scientific_name === name)
+            .reduce(
+              (sum: number, d: DailyData) =>
+                sum + (d.total_views || 0),
+              0
+            )
+        }))
+        .sort((a, b) => b.mentions - a.mentions)
+        .slice(0, 10)
 
-    if (!acc[category]) {
-      acc[category] = {
-        category,
-        video_count: 0,
-        total_views: 0
-      }
+      setTopDrugs(topDrugsCalc)
+
+      // Recalculate summary stats from filtered data
+
+      const breakdownMap = data.reduce(
+      (
+        acc: Record<
+          string,
+          {
+            scientific_name: string
+            video_count: number
+            total_views: number
+          }
+        >,
+        item: DailyData
+      ) => {
+        if (!acc[item.scientific_name]) {
+          acc[item.scientific_name] = {
+            scientific_name: item.scientific_name,
+            video_count: 0,
+            total_views: 0
+          }
+        }
+
+        acc[item.scientific_name].video_count += item.mentions
+        acc[item.scientific_name].total_views += item.total_views || 0
+
+        return acc
+      },
+      {}
+      
+    )
+
+    const filteredDrugBreakdown: FilteredDrugBreakdown[] =
+      Object.values(breakdownMap)
+        .map(drug => {
+          const originalDrug = drugsBreakdown.find(
+            d => d.scientific_name === drug.scientific_name
+          )
+
+          return {
+            ...drug,
+
+            avg_views:
+              drug.video_count > 0
+                ? drug.total_views / drug.video_count
+                : 0,
+
+            category: originalDrug?.category ?? 'unknown',
+
+            avg_confidence:
+              originalDrug?.avg_confidence ?? 0
+          }
+        })
+        .sort((a, b) => b.video_count - a.video_count)
+
+    const categoryMap = filteredDrugBreakdown.reduce(
+      (
+        acc: Record<
+          string,
+          {
+            category: string
+            video_count: number
+            total_views: number
+          }
+        >,
+        drug
+      ) => {
+        const category = drug.category ?? "unknown"
+
+        if (!acc[category]) {
+          acc[category] = {
+            category,
+            video_count: 0,
+            total_views: 0
+          }
+        }
+
+        acc[category].video_count += drug.video_count
+        acc[category].total_views += drug.total_views
+
+        return acc
+      },
+      {}
+    )
+
+    const filteredCategoryBreakdown: FilteredCategoryBreakdown[] =
+      Object.values(categoryMap)
+        .sort((a, b) => b.video_count - a.video_count)    
+
+    const totalStats = {
+      total_views: data.reduce(
+        (sum, item) => sum + (item.total_views || 0),
+        0
+      ),
+
+      total_videos: data.reduce(
+        (sum, item) => sum + item.mentions,
+        0
+      ),
+
+      total_drugs: new Set(
+        data.map(item => item.scientific_name)
+      ).size,
+
+      drugs_breakdown: filteredDrugBreakdown,
+
+      category_breakdown: filteredCategoryBreakdown
     }
 
-    acc[category].video_count += drug.video_count
-    acc[category].total_views += drug.total_views
-
-    return acc
-  },
-  {}
-)
-
-const filteredCategoryBreakdown: FilteredCategoryBreakdown[] =
-  Object.values(categoryMap)
-    .sort((a, b) => b.video_count - a.video_count)    
-
-/*const totalStats = {
-  total_views: data.reduce(
-    (sum, item) => sum + (item.total_views || 0),
-    0
-  ),
-
-  total_videos: data.reduce(
-    (sum, item) => sum + item.mentions,
-    0
-  ),
-
-  total_drugs: new Set(
-    data.map(item => item.scientific_name)
-  ).size,
-
-  drugs_breakdown: filteredDrugBreakdown
-}*/
-const totalStats = {
-  total_views: data.reduce(
-    (sum, item) => sum + (item.total_views || 0),
-    0
-  ),
-
-  total_videos: data.reduce(
-    (sum, item) => sum + item.mentions,
-    0
-  ),
-
-  total_drugs: new Set(
-    data.map(item => item.scientific_name)
-  ).size,
-
-  drugs_breakdown: filteredDrugBreakdown,
-
-  category_breakdown: filteredCategoryBreakdown
-}
-
-setFilterStats(totalStats)
-
-
-setFilterStats(totalStats)
-}
+    setFilterStats(totalStats)
+    }
 
   const filterData = () => {
     let data = [...dailyData]
@@ -512,33 +397,6 @@ setFilterStats(totalStats)
     }
 
     setFilteredData(data)
-
-    // Recalculate stats and top drugs based on filtered data
-    /*const drugMentions = data.reduce((acc: Record<string, number>, item: DailyData) => {
-      acc[item.scientific_name] = (acc[item.scientific_name] || 0) + item.mentions
-      return acc
-    }, {})
-
-    const topDrugNames = Object.entries(drugMentions)
-      .sort(([,a], [,b]) => (b as number) - (a as number))
-      .slice(0, 5)
-      .map(([name]) => name)
-
-    if (selectedDrugs.length === 0 || !selectedDrugs.some(d => topDrugNames.includes(d))) {
-      setSelectedDrugs(topDrugNames)
-    }
-
-    const topDrugsCalc = Object.entries(drugMentions)
-      .map(([name, mentions]) => ({
-        scientific_name: name,
-        mentions: mentions as number,
-        total_score: data
-          .filter((d: DailyData) => d.scientific_name === name)
-          .reduce((sum: number, d: DailyData) => sum + (d.total_views || 0), 0)
-      }))
-      .sort((a, b) => b.mentions - a.mentions)
-      .slice(0, 10)
-    setTopDrugs(topDrugsCalc)*/
     recalculateStats(data)
     setNonChartData(data.length)
   }
@@ -909,9 +767,6 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
         </div>
       </div>
 
-      
-        
-
       {/* Date Filters */} 
       <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border">
         <div className="flex flex-wrap items-end gap-4">
@@ -1031,7 +886,8 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
           </div>
         </div>
 
-        {/* <div className="bg-white rounded-xl shadow-sm p-4 border">
+        {/* Note: I'm leaving this in incase we can get the likes back someday 
+        <div className="bg-white rounded-xl shadow-sm p-4 border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1065,7 +921,6 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
         <div className="bg-white rounded-xl shadow-sm p-6 border">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">Drugs by Video Count</h3>
-            {/*<span className="text-sm text-gray-500">{drugsBreakdown.length} drugs</span>*/}
             <span className="text-sm text-gray-500">{filterStats?.total_drugs || 0} drugs</span>
           </div>
           <div className="space-y-3 max-h-80 overflow-y-auto">
@@ -1095,7 +950,6 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
                 </div>
                 <div className="flex gap-4 mt-1 text-xs text-gray-400">
                   <span>{formatNumber(drug.total_views)} views</span>
-                  {/* <span>{formatNumber(drug.total_likes)} likes</span> */}
                 </div>
               </div>
             ))}
@@ -1129,9 +983,6 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
                       {cat.video_count} videos
                     </span>
                   </div>
-                  {/*<div className="w-20 text-right text-xs text-gray-500">
-                    {formatNumber(cat.total_views)} views
-                  </div>*/}
                 </div>
               )
             })}
