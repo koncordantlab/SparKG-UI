@@ -222,6 +222,7 @@ export default function TikTokDashboard() {
     } finally {
       setLoading(false)
     }
+    setSelectedChartRange(30)
   }
 
   //everytihing below is for the line graphs

@@ -126,6 +126,7 @@ export default function RedditDashboard() {
     } finally {
       setLoading(false)
     }
+    setSelectedChartRange(30)
   }
 
   useEffect(() => {

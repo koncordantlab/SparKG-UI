@@ -138,6 +138,7 @@ export default function YouTubeDashboard() {
     } finally {
       setLoading(false)
     }
+    setSelectedChartRange(30)
   }
 
   const recalculateStats = (data: WeeklyData[]) => {
