@@ -65,6 +65,10 @@ export default function RedditDashboard() {
   const [selectedChartRange, setSelectedChartRange] = useState<number>(selectedRange)
   const [nonChartData, setNonChartData] = useState<number>(0)
 
+  const [filteredChartData, setFilteredChartData] = useState<DailyData[]>([])
+  const [selectedChartDrugs, setSelectedChartDrugs] = useState<string[]>([])
+  const [topChartDrugs, setTopChartDrugs] = useState<TopDrug[]>([])
+
   // Extract available years from data (date format: "2026-01-02")
   const availableYears = useMemo(() => {
     const years = new Set<string>()
@@ -177,6 +181,42 @@ const recalculateStats = (data: DailyData[]) => {
     setStats(totalStats)
   }
 
+ const recalculateChartStats = (data: DailyData[]) => {
+    // Recalculate stats and top drugs based on filtered data
+    const drugMentions = data.reduce((acc: Record<string, number>, item: DailyData) => {
+      acc[item.scientific_name] = (acc[item.scientific_name] || 0) + item.mentions
+      return acc
+    }, {})
+
+    const topDrugNames = Object.entries(drugMentions)
+      .sort(([,a], [,b]) => (b as number) - (a as number))
+      .slice(0, 5)
+      .map(([name]) => name)
+
+    if (selectedChartDrugs.length === 0 || !selectedChartDrugs.some(d => topDrugNames.includes(d))) {
+      setSelectedChartDrugs(topDrugNames)
+    }
+
+    const topDrugsCalc = Object.entries(drugMentions)
+      .map(([name, mentions]) => ({
+        scientific_name: name,
+        mentions: mentions as number,
+        total_score: data
+          .filter((d: DailyData) => d.scientific_name === name)
+          .reduce((sum: number, d: DailyData) => sum + (d.total_engagement || 0), 0)
+      }))
+      .sort((a, b) => b.mentions - a.mentions)
+      .slice(0, 10)
+    setTopChartDrugs(topDrugsCalc)
+
+    /*const totalStats = data.reduce((acc: typeof stats, item: DailyData) => ({
+      total_posts: acc.total_posts + item.mentions,
+      total_score: acc.total_score + (item.total_engagement || 0),
+      total_comments: acc.total_comments + (item.total_comments || 0)
+    }), { total_posts: 0, total_score: 0, total_comments: 0 })
+    setStats(totalStats)*/
+  } 
+
 const filterData = () => {
     let data = [...dailyData]
 
@@ -273,7 +313,8 @@ const filterChartData = () => {
       })
     }
 
-    setFilteredData(data)
+    setFilteredChartData(data)
+    recalculateChartStats(data)
 }
 
 const filterChartRangeData = () => {
@@ -294,8 +335,8 @@ const filterChartRangeData = () => {
     }) //not 100% sure about this code
 
     
-    setFilteredData(data)
-  
+    setFilteredChartData(data)
+    recalculateChartStats(data)
   }
   else { filterChartData() }
 }
@@ -511,8 +552,8 @@ const getLineChartData = () => {
   > = {}
 
   // First select only the drugs being displayed
-  const selectedData = filteredData.filter(d =>
-    selectedDrugs.includes(d.scientific_name)
+  const selectedData = filteredChartData.filter(d =>
+    selectedChartDrugs.includes(d.scientific_name)
   )
 
   // Remove local rolling-median outliers
@@ -543,7 +584,7 @@ const getLineChartData = () => {
 
 const maxValue = Math.max(
   ...getLineChartData().flatMap(row =>
-    selectedDrugs.map(drug => {
+    selectedChartDrugs.map(drug => {
       const value = row[drug]
 
       return typeof value === "number"
@@ -573,10 +614,10 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
   const clearFilters = () => {
     setSelectedYear('')
     setSelectedMonth('')
-    setSelectedChartYear('')
-    setSelectedChartMonth('')
+    /*setSelectedChartYear('')
+    setSelectedChartMonth('')*/
     setSelectedRange(0)
-    setSelectedChartRange(0)
+    //setSelectedChartRange(0)
   }
 
   //This code is for trying to space the labels out in the graph
@@ -957,10 +998,10 @@ const labelRadiusOffsets =
               onChange={(e) => {
                 setSelectedYear(e.target.value)
                 setSelectedMonth('') // Reset month when year changes
-                setSelectedChartYear(e.target.value)
-                setSelectedChartMonth('')
+                /*setSelectedChartYear(e.target.value)
+                setSelectedChartMonth('')*/
                 setSelectedRange(0)
-                setSelectedChartRange(0)
+                //setSelectedChartRange(0)
               }}
               className="border rounded-lg px-3 py-2 min-w-[120px]"
             >
@@ -977,9 +1018,9 @@ const labelRadiusOffsets =
               value={selectedMonth}
               onChange={(e) => {
                 setSelectedMonth(e.target.value)
-                setSelectedChartMonth(e.target.value)
+                //setSelectedChartMonth(e.target.value)
                 setSelectedRange(0)
-                setSelectedChartRange(0)
+                //setSelectedChartRange(0)
               }}
               className="border rounded-lg px-3 py-2 min-w-[140px]"
               disabled={!selectedYear}
@@ -1003,10 +1044,10 @@ const labelRadiusOffsets =
               onChange={(e) => {
                 setSelectedYear('')
                 setSelectedMonth('')
-                setSelectedChartYear('')
-                setSelectedChartMonth('')
+                /*setSelectedChartYear('')
+                setSelectedChartMonth('')*/
                 setSelectedRange(Number(e.target.value))
-                setSelectedChartRange(Number(e.target.value))
+                //setSelectedChartRange(Number(e.target.value))
               }}
               className="border rounded-lg px-3 py-2 min-w-[140px]"
             >
@@ -1211,17 +1252,17 @@ const labelRadiusOffsets =
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Daily Trends</h3>
           <div className="flex flex-wrap gap-2">
-            {topDrugs.slice(0, 8).map((drug, idx) => (
+            {topChartDrugs.slice(0, 8).map((drug, idx) => (
               <button
                 key={drug.scientific_name}
                 onClick={() => toggleDrug(drug.scientific_name)}
                 className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                  selectedDrugs.includes(drug.scientific_name)
+                  selectedChartDrugs.includes(drug.scientific_name)
                     ? 'text-white'
                     : 'bg-gray-100 text-gray-600'
                 }`}
                 style={{
-                  backgroundColor: selectedDrugs.includes(drug.scientific_name)
+                  backgroundColor: selectedChartDrugs.includes(drug.scientific_name)
                     ? COLORS[idx % COLORS.length]
                     : undefined
                 }}
@@ -1253,12 +1294,12 @@ const labelRadiusOffsets =
               />
               <Tooltip />
               <Legend />
-              {selectedDrugs.map((drug) => (
+              {selectedChartDrugs.map((drug) => (
                 <Line
                   key={drug}
                   type="monotone"
                   dataKey={drug}
-                  stroke={COLORS[topDrugs.findIndex(d => d.scientific_name === drug) % COLORS.length]}
+                  stroke={COLORS[topChartDrugs.findIndex(d => d.scientific_name === drug) % COLORS.length]}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   connectNulls

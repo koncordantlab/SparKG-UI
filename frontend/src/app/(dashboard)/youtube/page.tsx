@@ -65,6 +65,10 @@ export default function YouTubeDashboard() {
   const [selectedChartRange, setSelectedChartRange] = useState<number>(selectedRange)
   const [nonChartData, setNonChartData] = useState<number>(0)
 
+  const [filteredChartData, setFilteredChartData] = useState<WeeklyData[]>([])
+  const [selectedChartDrugs, setSelectedChartDrugs] = useState<string[]>([])
+  const [topChartDrugs, setTopChartDrugs] = useState<TopDrug[]>([])
+
   // Extract available years from data (date format: "2025-01-15")
   const availableYears = useMemo(() => {
     const years = new Set<string>()
@@ -179,6 +183,44 @@ export default function YouTubeDashboard() {
     setStats(totalStats)
   }
 
+   const recalculateChartStats = (data: WeeklyData[]) => {
+    // Recalculate stats and top drugs based on filtered data
+    const drugMentions = data.reduce((acc: Record<string, { mentions: number, views: number }>, item: WeeklyData) => {
+      if (!acc[item.scientific_name]) {
+        acc[item.scientific_name] = { mentions: 0, views: 0 }
+      }
+      acc[item.scientific_name].mentions += item.mentions
+      acc[item.scientific_name].views += item.total_views || 0
+      return acc
+    }, {})
+
+    const topDrugNames = Object.entries(drugMentions)
+      .sort(([,a], [,b]) => b.mentions - a.mentions)
+      .slice(0, 5)
+      .map(([name]) => name)
+
+    if (selectedChartDrugs.length === 0 || !selectedChartDrugs.some(d => topDrugNames.includes(d))) {
+      setSelectedChartDrugs(topDrugNames)
+    }
+
+    const topDrugsCalc = Object.entries(drugMentions)
+      .map(([name, data]) => ({
+        scientific_name: name,
+        mentions: data.mentions,
+        total_views: data.views
+      }))
+      .sort((a, b) => b.mentions - a.mentions)
+      .slice(0, 10)
+    setTopChartDrugs(topDrugsCalc)
+
+    /*const totalStats = data.reduce((acc: typeof stats, item: WeeklyData) => ({
+      total_videos: acc.total_videos + item.mentions,
+      total_views: acc.total_views + (item.total_views || 0),
+      total_likes: acc.total_likes + (item.total_likes || 0)
+    }), { total_videos: 0, total_views: 0, total_likes: 0 })
+    setStats(totalStats)*/
+  }
+
   const filterData = () => {
     let data = [...weeklyData]
 
@@ -242,7 +284,8 @@ const filterChartData = () => {
       })
     }
 
-    setFilteredData(data)
+    setFilteredChartData(data)
+    recalculateChartStats(data)
 }
 
 const filterChartRangeData = () => {
@@ -263,7 +306,8 @@ const filterChartRangeData = () => {
     }) //not 100% sure about this code
 
     
-    setFilteredData(data)
+    setFilteredChartData(data)
+    recalculateChartStats(data)
   
   }
   else { filterChartData() }
@@ -457,8 +501,8 @@ const getLineChartData = () => {
   > = {}
 
   // First select only the drugs being displayed
-  const selectedData = filteredData.filter(d =>
-    selectedDrugs.includes(d.scientific_name)
+  const selectedData = filteredChartData.filter(d =>
+    selectedChartDrugs.includes(d.scientific_name)
   )
 
   // Remove local rolling-median outliers
@@ -521,10 +565,10 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
   const clearFilters = () => {
     setSelectedYear('')
     setSelectedMonth('')
-    setSelectedChartYear('')
-    setSelectedChartMonth('')
+    /*setSelectedChartYear('')
+    setSelectedChartMonth('')*/
     setSelectedRange(0)
-    setSelectedChartRange(0)
+    //setSelectedChartRange(0)
   }
 
     const clearChartFilters = () => {
@@ -562,10 +606,10 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
               onChange={(e) => {
                 setSelectedYear(e.target.value)
                 setSelectedMonth('')
-                setSelectedChartYear(e.target.value)
-                setSelectedChartMonth('')
+                /*setSelectedChartYear(e.target.value)
+                setSelectedChartMonth('')*/
                 setSelectedRange(0)
-                setSelectedChartRange(0)
+                //setSelectedChartRange(0)
               }}
               className="border rounded-lg px-3 py-2 min-w-[120px]"
             >
@@ -582,9 +626,9 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
               value={selectedMonth}
               onChange={(e) => {
                 setSelectedMonth(e.target.value)
-                setSelectedChartMonth(e.target.value)
+                //setSelectedChartMonth(e.target.value)
                 setSelectedRange(0)
-                setSelectedChartRange(0)
+                //setSelectedChartRange(0)
               }}
               className="border rounded-lg px-3 py-2 min-w-[140px]"
               disabled={!selectedYear}
@@ -603,10 +647,10 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
               onChange={(e) => {
                 setSelectedYear('')
                 setSelectedMonth('')
-                setSelectedChartYear('')
-                setSelectedChartMonth('')
+                /*setSelectedChartYear('')
+                setSelectedChartMonth('')*/
                 setSelectedRange(Number(e.target.value))
-                setSelectedChartRange(Number(e.target.value))
+                //setSelectedChartRange(Number(e.target.value))
               }}
               className="border rounded-lg px-3 py-2 min-w-[140px]"
             >
@@ -815,17 +859,17 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Daily Trends</h3>
           <div className="flex flex-wrap gap-2">
-            {topDrugs.slice(0, 8).map((drug, idx) => (
+            {topChartDrugs.slice(0, 8).map((drug, idx) => (
               <button
                 key={drug.scientific_name}
                 onClick={() => toggleDrug(drug.scientific_name)}
                 className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                  selectedDrugs.includes(drug.scientific_name)
+                  selectedChartDrugs.includes(drug.scientific_name)
                     ? 'text-white'
                     : 'bg-gray-100 text-gray-600'
                 }`}
                 style={{
-                  backgroundColor: selectedDrugs.includes(drug.scientific_name)
+                  backgroundColor: selectedChartDrugs.includes(drug.scientific_name)
                     ? LINE_COLORS[idx % LINE_COLORS.length]
                     : undefined
                 }}
@@ -863,12 +907,12 @@ const { axisMax, ticks } = getYAxisScale(maxValue, 4)
               />
               <Tooltip />
               <Legend />
-              {selectedDrugs.map((drug) => (
+              {selectedChartDrugs.map((drug) => (
                 <Line
                   key={drug}
                   type="monotone"
                   dataKey={drug}
-                  stroke={LINE_COLORS[topDrugs.findIndex(d => d.scientific_name === drug) % LINE_COLORS.length]}
+                  stroke={LINE_COLORS[topChartDrugs.findIndex(d => d.scientific_name === drug) % LINE_COLORS.length]}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   connectNulls
